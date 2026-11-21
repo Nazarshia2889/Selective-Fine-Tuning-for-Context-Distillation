@@ -1,0 +1,28 @@
+base_config: configs/base.yaml
+
+tasks: [label_mapping, knowledge, method_math]
+granularities: [weight, row, block]
+budgets_blocks: [1, 2, 4]          # ~4%, 8%, 17% of eligible weights; weight/row budgets are param-matched
+selectors: [topk, random]
+include_full: true
+
+# Used for the main sweep when lr_tune results are missing; overridden by best_lr.json.
+default_lr:
+  weight: 3.0e-5
+  row: 3.0e-5
+  block: 3.0e-5
+  full: 3.0e-6
+
+lr_tune:
+  pilot_task: knowledge
+  pilot_context: 0
+  selector: topk
+  budget_blocks: 2
+  # Pick the best no-context val accuracy among lrs whose MMLU drop is <= this.
+  # (Forgetting diagnostic on knowledge/c0: weight-level lr >= 1e-4 and full FT at 3e-5 collapsed MMLU.)
+  max_mmlu_drop: 0.02
+  grid:                            # 4 methods x 3 lrs = 12 runs
+    weight: [1.0e-5, 3.0e-5, 1.0e-4]
+    row: [1.0e-5, 3.0e-5, 1.0e-4]
+    block: [1.0e-5, 3.0e-5, 1.0e-4]
+    full: [1.0e-6, 3.0e-6, 1.0e-5]
