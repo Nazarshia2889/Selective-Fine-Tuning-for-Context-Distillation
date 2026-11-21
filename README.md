@@ -59,3 +59,49 @@ We measure the fraction of ICL improvement recovered without the context, forget
 \bibliography{references}
 
 \end{document}
+
+---
+
+## Running the experiments
+
+### Layout
+| Path | What it does |
+|---|---|
+| `configs/base.yaml`, `configs/sweep.yaml` | Shared settings, plus the 183-run grid (12 LR-tuning runs + 162 selective + 9 full) |
+| `sfcd/tasks/` | `label_mapping`, `knowledge`, `method_math` (used in the sweep), plus `base_arith` and `rule_arith` (kept, not used). Add a task by subclassing `Task` and calling `register_task` |
+| `sfcd/selection/` | Gradient scoring (mean \|grad\| over 8 batches), then top-k or random selection at weight, row or block granularity. Budgets are parameter-matched to 1, 2 or 4 blocks |
+| `sfcd/sparse/params.py` | Trainable deltas for the selected units only, so optimizer state scales with the budget. Also handles export and merge |
+| `sfcd/pipeline.py` | Idempotent stages: data → teacher → filter → mmlu → score → train_eval → aggregate |
+| `modal_app.py` | Modal wrappers for each stage. Uses an A100-40GB, fans out with `.map()`, stores artifacts on the `sfcd-vol` Volume and logs to W&B |
+
+### Local (no Modal)
+```bash
+uv venv .venv && uv pip install -p .venv -e ".[dev,modal]"
+.venv/bin/python -m pytest                 # offline unit tests
+.venv/bin/python scripts/sweep_dry_run.py  # prints the run counts
+.venv/bin/python scripts/run_local.py      # full pipeline on a tiny model (CPU)
+```
+
+### Modal
+```bash
+modal secret create wandb WANDB_API_KEY=...       # once per workspace
+modal run modal_app.py --stage prep               # data, teacher, 20pp filter, MMLU baseline, grad scores
+modal run modal_app.py --stage lr_tune            # 12 runs on the pilot context
+modal run modal_app.py --stage select_lr          # writes best_lr.json
+modal run modal_app.py --stage main --dry-run     # 171 runs
+modal run --detach modal_app.py --stage main --spawn   # submits all runs and returns; laptop can sleep
+modal run modal_app.py --stage progress            # finished-run counts
+modal run modal_app.py --stage aggregate          # writes ./results/{runs,summary}.csv
+modal run modal_app.py --stage overlap            # mask overlap across contexts
+```
+- Pass config overrides with `--overrides train.epochs=2,wandb.mode=disabled`.
+- Environment variables:
+  - `SFCD_GPU`: GPU type.
+  - `SFCD_MAX_CONTAINERS`: maximum parallel containers.
+  - `SFCD_VOLUME`: Volume name.
+- Finished runs are skipped on rerun. Add `--force` to redo them.
+
+### Notes from the first runs
+- **Reasoning task.** Base-7 addition failed the 20-point filter. Even with 32 worked examples, Qwen3.5-0.8B scores no better with the context than without. It was replaced by `method_math`, whose contexts are real problem types solved by a specific method: trailing zeros of n!, pipe-filling rates, and remainders mod 9 via digit sums. Teacher gains on validation were +66, +31 and +40 points. `--stage probe` and `--stage probe_method` test only the teacher on candidate tasks.
+- **Learning rates.** A learning rate that is too high collapses MMLU to chance (the model answers one letter for every question). `lr_tune` picks the best validation accuracy among learning rates whose MMLU drop is at most `lr_tune.max_mmlu_drop` (2 points). `--stage diagnose` runs the forgetting diagnostic.
+- **Memory.** Batches of 16 are split into micro-batches of 4 with gradient accumulation (`micro_batch_size`). The result is the same as the full batch; without the split, the long math answers ran out of memory.

@@ -1,0 +1,42 @@
+model:
+  name: Qwen/Qwen3.5-0.8B
+  compute_dtype: bfloat16
+  max_seq_len: 1024
+  full_scope: all
+
+data:
+  n_candidates: 5   # contexts generated per task; first n_keep passing the filter are kept
+  n_keep: 3
+  n_train: 500
+  n_val: 100
+  n_test: 200
+  min_gap: 0.20
+  seed: 0
+
+train:
+  epochs: 3
+  batch_size: 16
+  micro_batch_size: 4      # gradient accumulation (long math answers OOM at 16)
+  weight_decay: 0.0
+  warmup_ratio: 0.05
+  max_grad_norm: 1.0
+  seed: 0
+
+selection:
+  score_batches: 8
+  score_batch_size: 16
+  micro_batch_size: 4
+  random_seed: 0
+
+eval:
+  gen_batch_size: 32
+  mmlu_n: 500
+  mmlu_seed: 0
+  mmlu_batch_size: 16
+
+wandb:
+  project: sfcd
+  entity: null
+  mode: online
+
+save_delta: true

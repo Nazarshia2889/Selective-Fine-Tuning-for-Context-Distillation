@@ -1,0 +1,30 @@
+[project]
+name = "sfcd"
+version = "0.1.0"
+description = "Selective fine-tuning for context distillation: weight sparsity and granularity experiments"
+requires-python = ">=3.10"
+dependencies = [
+    "torch>=2.4",
+    "transformers>=4.57",
+    "accelerate",
+    "datasets",
+    "safetensors",
+    "pydantic>=2",
+    "pyyaml",
+    "pandas",
+    "wandb",
+]
+
+[project.optional-dependencies]
+modal = ["modal>=1.0"]
+dev = ["pytest"]
+
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["sfcd*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
