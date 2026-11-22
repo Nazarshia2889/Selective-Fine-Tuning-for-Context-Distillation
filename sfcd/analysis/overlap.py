@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import itertools
+import re
 
 import pandas as pd
 import torch
@@ -17,10 +18,12 @@ def jaccard(a: torch.Tensor, b: torch.Tensor) -> float:
     return inter / union if union else float("nan")
 
 
-def overlap_table(paths: Paths, linears: list[LinearInfo], contexts: list[tuple[str, int]],
+def overlap_table(paths: Paths, contexts: list[tuple[str, int]],
                   granularities=("weight", "row", "block"), budgets=(1, 2, 4), device="cpu") -> pd.DataFrame:
-    """linears must describe the model the scores came from (see sfcd.model.eligible_linears).
-    Computing it needs only the model config, e.g. via a meta-device model."""
+    """Jaccard overlap of top-gradient selections between every pair of contexts."""
+    first = torch.load(paths.scores(*contexts[0]), map_location="cpu")["scores"]
+    linears = linears_from_scores(first)
+    del first
     rows = []
     for gran, b in itertools.product(granularities, budgets):
         masks = {}
@@ -34,13 +37,10 @@ def overlap_table(paths: Paths, linears: list[LinearInfo], contexts: list[tuple[
     return pd.DataFrame(rows)
 
 
-def linears_from_config(model_name: str) -> list[LinearInfo]:
-    """Eligible linears without loading weights (meta device)."""
-    from transformers import AutoConfig, AutoModelForCausalLM
-
-    from sfcd.model import eligible_linears
-
-    cfg = AutoConfig.from_pretrained(model_name)
-    with torch.device("meta"):
-        model = AutoModelForCausalLM.from_config(cfg)
-    return eligible_linears(model)
+def linears_from_scores(scores: dict[str, torch.Tensor]) -> list[LinearInfo]:
+    """Eligible linears recovered from a saved score file (keys are '<module>.weight', in model order)."""
+    out = []
+    for name, t in scores.items():
+        m = re.search(r"\.(\d+)\.", name)
+        out.append(LinearInfo(name[: -len(".weight")], int(m.group(1)), t.shape[0], t.shape[1]))
+    return out

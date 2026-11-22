@@ -157,11 +157,11 @@ def aggregate(stage: str = "main") -> dict:
 
 
 @app.function(volumes={ROOT: vol}, timeout=3 * 3600, memory=65536)
-def overlap(model_name: str, contexts: list[tuple[str, int]]) -> str:
-    from sfcd.analysis.overlap import linears_from_config, overlap_table
+def overlap(contexts: list[tuple[str, int]]) -> str:
+    from sfcd.analysis.overlap import overlap_table
 
     paths = _setup()
-    df = overlap_table(paths, linears_from_config(model_name), [tuple(c) for c in contexts])
+    df = overlap_table(paths, [tuple(c) for c in contexts])
     (paths.root / "tables").mkdir(parents=True, exist_ok=True)
     df.to_csv(paths.root / "tables" / "overlap.csv", index=False)
     vol.commit()
@@ -307,5 +307,5 @@ def main(stage: str = "prep", sweep: str = "configs/sweep.yaml", overrides: str 
         kept = read_state.remote()["kept"] or {}
         ctxs = [(t, c) for t, cs in kept.items() for c in cs]
         Path("results").mkdir(exist_ok=True)
-        Path("results/overlap.csv").write_text(overlap.remote(base.model.name, ctxs))
+        Path("results/overlap.csv").write_text(overlap.remote(ctxs))
         print("wrote results/overlap.csv")
