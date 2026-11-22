@@ -231,3 +231,25 @@ def test_micro_batches_match_full_batch_gradient(tiny):
         (model(**mb).loss * w).backward()
     for n, p in model.named_parameters():
         torch.testing.assert_close(p.grad, full[n], atol=1e-6, rtol=1e-4)
+
+
+@pytest.mark.parametrize("gran", ["weight", "row", "block", "full"])
+def test_saved_delta_roundtrip(tiny, gran):
+    from sfcd.pipeline import apply_saved_delta
+
+    model = copy.deepcopy(tiny)
+    lin = eligible_linears(model)
+    mask = None if gran == "full" else select(random_scores(lin, 4), lin, gran, 1)
+    params = apply_selection(model, lin, gran, mask)
+    opt = torch.optim.AdamW(params, lr=1e-2)
+    for _ in range(2):
+        model(**_batch()).loss.backward()
+        opt.step()
+        opt.zero_grad()
+    delta = export_delta(model, gran, params)
+    merge_into_base(model)
+
+    fresh = copy.deepcopy(tiny)
+    apply_saved_delta(fresh, gran, delta)
+    for (n, a), (_, b) in zip(model.state_dict().items(), fresh.state_dict().items()):
+        torch.testing.assert_close(a, b, atol=1e-6, rtol=1e-5, msg=n)

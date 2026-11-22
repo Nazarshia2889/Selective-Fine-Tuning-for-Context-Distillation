@@ -113,6 +113,22 @@ def build_prompt(tok, task: Task, context_text: str | None, query: str) -> str:
 
 
 @torch.no_grad()
+def stop_token_ids(model, tok) -> list[int]:
+    """End-of-turn ids. Qwen's chat turn ends with <|im_end|> (tok.eos_token), but the model config's eos
+    is <|endoftext|>; without both, fine-tuned students can run past <|im_end|> ("stonestonestone")."""
+    ids = []
+    gc = getattr(model, "generation_config", None)
+    cfg_eos = getattr(gc, "eos_token_id", None)
+    for x in [tok.eos_token_id, *(cfg_eos if isinstance(cfg_eos, list) else [cfg_eos])]:
+        if x is not None and x not in ids:
+            ids.append(x)
+    for t in ("<|im_end|>", "<|endoftext|>"):
+        x = tok.convert_tokens_to_ids(t)
+        if isinstance(x, int) and x != tok.unk_token_id and x not in ids:
+            ids.append(x)
+    return ids
+
+
 def generate(model, tok, prompts: list[str], max_new_tokens: int, batch_size: int,
              model_cfg: ModelCfg) -> list[str]:
     """Greedy batched generation; returns only the new text. Prompts are length-sorted for efficiency."""
@@ -122,12 +138,13 @@ def generate(model, tok, prompts: list[str], max_new_tokens: int, batch_size: in
     tok.padding_side = "left"
     order = sorted(range(len(prompts)), key=lambda i: len(prompts[i]))
     outs: list[str] = [""] * len(prompts)
+    stops = stop_token_ids(model, tok)
     for s in range(0, len(order), batch_size):
         idx = order[s:s + batch_size]
         enc = tok([prompts[i] for i in idx], return_tensors="pt", padding=True, add_special_tokens=False).to(device)
         with autocast(model_cfg, device):
             gen = model.generate(**enc, max_new_tokens=max_new_tokens, do_sample=False,
-                                 pad_token_id=tok.pad_token_id, use_cache=True)
+                                 pad_token_id=tok.pad_token_id, eos_token_id=stops, use_cache=True)
         texts = tok.batch_decode(gen[:, enc["input_ids"].shape[1]:], skip_special_tokens=True)
         for i, t in zip(idx, texts):
             outs[i] = t.strip()

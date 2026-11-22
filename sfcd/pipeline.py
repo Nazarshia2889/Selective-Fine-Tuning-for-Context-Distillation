@@ -281,3 +281,82 @@ def read_state(paths: Paths) -> dict:
     kept = read_json(paths.kept())["kept"] if paths.kept().exists() else None
     best_lr = read_json(paths.best_lr()) if paths.best_lr().exists() else None
     return {"kept": kept, "best_lr": best_lr}
+
+
+# ----------------------------------------------------------------------------- re-evaluation
+
+EVAL_VERSION = 2  # v2: generation stops at <|im_end|> (v1 let students run on past it)
+
+
+def apply_saved_delta(model, granularity: str, delta: dict[str, torch.Tensor]) -> None:
+    """Inverse of sparse.params.export_delta, applied to a plain (unwrapped) model in place."""
+    with torch.no_grad():
+        if granularity in ("weight", "row"):
+            suffix = ".idx" if granularity == "weight" else ".rows"
+            for key, idx in delta.items():
+                if not key.endswith(suffix):
+                    continue
+                name = key[: -len(suffix)]
+                w = model.get_submodule(name).weight
+                d = delta[f"{name}.delta"].to(w.device, w.dtype)
+                idx = idx.to(w.device, torch.long)
+                (w.view(-1) if granularity == "weight" else w).index_add_(0, idx, d)
+        else:
+            params = dict(model.named_parameters())
+            for name, v in delta.items():
+                params[name].copy_(v.to(params[name].device, params[name].dtype))
+
+
+def stage_reeval_context(paths: Paths, task_name: str, cid: int, stage: str = "main") -> dict:
+    """Recompute baselines and every saved run of one context with the current eval code (no training)."""
+    from safetensors.torch import load_file
+
+    files = []
+    for f in sorted(paths.results_dir(stage).glob("*.json")):
+        r = read_json(f)
+        if r["config"]["task"] == task_name and r["config"]["context_id"] == cid:
+            files.append((f, r))
+    if not files:
+        return {"task": task_name, "context_id": cid, "n": 0}
+    base = BaseCfg.model_validate(files[0][1]["config"]["base"])
+    task = get_task(task_name)
+    ctx, splits = load_context(paths, task_name, cid)
+    model, tok = load_model(base.model)
+    orig = {n: p.detach().clone() for n, p in model.named_parameters()}
+
+    # baselines (teacher training answers are left untouched)
+    bpath = paths.ctx_dir(task_name, cid) / "baselines.json"
+    b = read_json(bpath)
+    if b.get("eval_version") != EVAL_VERSION:
+        b_old = {k: b[k] for k in ("zero_shot_val", "icl_val", "zero_shot_test", "icl_test")}
+        for split in ("val", "test"):
+            b[f"zero_shot_{split}"], _ = eval_task(model, tok, task, splits[split], None, base.eval, base.model)
+            b[f"icl_{split}"], _ = eval_task(model, tok, task, splits[split], ctx.text, base.eval, base.model)
+        b["v1"], b["eval_version"] = b_old, EVAL_VERSION
+        write_json(bpath, b)
+
+    done = 0
+    for f, r in files:
+        if r.get("eval_version") == EVAL_VERSION:
+            continue
+        g = r["config"]["granularity"]
+        with torch.no_grad():
+            for n, p in model.named_parameters():
+                p.copy_(orig[n])
+        apply_saved_delta(model, g, load_file(str(paths.delta(stage, r["run_id"]))))
+        test_acc, test_preds = eval_task(model, tok, task, splits["test"], None, base.eval, base.model)
+        val_acc, _ = eval_task(model, tok, task, splits["val"], None, base.eval, base.model)
+        r["v1"] = {k: r.get(k) for k in ("student_test", "student_val", "zero_shot_test", "icl_test", "recovery_test")}
+        r.update({
+            "student_test": test_acc, "student_val": val_acc,
+            "zero_shot_test": b["zero_shot_test"], "icl_test": b["icl_test"],
+            "recovery_test": recovery(test_acc, b["zero_shot_test"], b["icl_test"]),
+            "sample_preds": [{"query": e.query, "gold": e.answer, "pred": p}
+                             for e, p in list(zip(splits["test"], test_preds))[:10]],
+            "eval_version": EVAL_VERSION,
+        })
+        write_json(f, r)
+        done += 1
+        log.info("re-eval %s: test %.3f (was %.3f)", r["name"], test_acc, r["v1"]["student_test"])
+    return {"task": task_name, "context_id": cid, "n": len(files), "reevaluated": done,
+            "zero_shot_test": b["zero_shot_test"], "icl_test": b["icl_test"], "baseline_v1": b.get("v1")}

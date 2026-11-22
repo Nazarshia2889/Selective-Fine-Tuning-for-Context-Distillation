@@ -121,6 +121,15 @@ def select_lr(max_mmlu_drop: float) -> dict:
     return out
 
 
+@app.function(**{**gpu_kwargs, "timeout": 6 * 3600})
+def reeval(task: str, cid: int, stage: str = "main") -> dict:
+    from sfcd import pipeline
+
+    out = pipeline.stage_reeval_context(_setup(), task, cid, stage)
+    vol.commit()
+    return out
+
+
 @app.function(volumes={ROOT: vol}, timeout=600)
 def progress() -> str:
     paths = _setup()
@@ -252,6 +261,14 @@ def main(stage: str = "prep", sweep: str = "configs/sweep.yaml", overrides: str 
         kept = read_state.remote()["kept"] or {}
         jobs = [(bd, t, c) for t, cs in kept.items() for c in cs]
         _report(list(score.starmap(jobs, return_exceptions=True)))
+    if stage == "reeval":
+        kept = read_state.remote()["kept"] or {}
+        jobs = [(t, c) for t, cs in kept.items() for c in cs]
+        if spawn:
+            reeval.spawn_map([j[0] for j in jobs], [j[1] for j in jobs])
+            print(f"submitted {len(jobs)} re-eval jobs")
+            return
+        _report(list(reeval.starmap(jobs, return_exceptions=True)))
     if stage == "progress":
         print(progress.remote())
     if stage == "select_lr":
