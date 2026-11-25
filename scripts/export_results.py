@@ -9,6 +9,7 @@ Tables (one row per run unless noted):
   math_general.csv  MATH accuracy of every math student (and the untrained model)
   cost_runs.csv     training time, peak memory and storage of every run
   loss_curves.csv   training loss per step (run_id, step, loss)
+  cost_bench.csv    controlled timing/memory benchmark (one container per task, 3 repeats per setting)
 """
 from __future__ import annotations
 
@@ -37,6 +38,7 @@ def fetch() -> None:
     items = ["results/sparsity", "results/granularity", "diagnostics/math_bench",
              "diagnostics/math_bench_students.json", "diagnostics/delta_norms_sparsity.json",
              "diagnostics/delta_norms_granularity.json"]
+    items += [f"diagnostics/cost_bench_{t}.json" for t in KEPT]
     items += [f"data/{t}/c{c}/{f}" for t, cs in KEPT.items() for c in cs for f in ("baselines.json", "context.json", "test.jsonl")]
     for it in items:
         dest = REMOTE / it
@@ -116,7 +118,22 @@ def build() -> None:
     _write("math_general.csv", m)
     _write("cost_runs.csv", cost)
     _write("loss_curves.csv", curves)
+    _write("cost_bench.csv", cost_bench())
     _write("inference_tokens.csv", inference_tokens())
+
+
+def cost_bench() -> list[dict]:
+    """Rows of diagnostics/cost_bench_<task>.json (sfcd/analysis/cost_bench.py); fkey = % of eligible weights."""
+    rows = []
+    for t in KEPT:
+        d = json.load(open(REMOTE / f"diagnostics/cost_bench_{t}.json"))
+        for r in d["rows"]:
+            method = f"Full fine-tuning ({r['full_scope']})" if r["granularity"] == "full" else "Weights"
+            rows.append({"task": TASKS[t], "method": method, "fkey": round(r["n_trained"] / r["n_eligible"] * 100, 4),
+                         "lr": r["lr"], "repeat": r["repeat"], "n_trained": r["n_trained"], "oom": r["oom"],
+                         "train_time_s": r.get("train_time_s", ""), "peak_mem_gb": r["peak_mem_gb"],
+                         "gpu": d["env"]["gpu"], "torch": d["env"]["torch"], "transformers": d["env"]["transformers"]})
+    return rows
 
 
 def inference_tokens() -> list[dict]:

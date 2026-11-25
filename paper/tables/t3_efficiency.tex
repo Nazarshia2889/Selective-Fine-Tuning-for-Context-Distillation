@@ -1,20 +1,17 @@
 \begin{tabular}{llrrr}
 \toprule
-Task & Method (4.2\% budget) & Peak memory (GB) & Storage (MB) & Train time (s, median) \\
+Task & Method & Trained (M) & Memory (GB) & Time (s) \\
 \midrule
-Knowledge Retrieval & Weights & 6.0 & 166 & 67 \\
-Knowledge Retrieval & Rows & 5.9 & 83 & 68 \\
-Knowledge Retrieval & Blocks & 5.7 & 86 & 46 \\
-Knowledge Retrieval & Full fine-tuning & 14.3 & 3,010 & 200 \\
+Knowledge Retrieval & Weights, 4.2\% & 20.7 & 6.2 & 61 \\
+Knowledge Retrieval & Full, linear layers & 497.6 & 11.3 & 56 \\
+Knowledge Retrieval & Full, all weights & 752.4 & 14.4 & 61 \\
 \midrule
-Label Mapping & Weights & 8.6 & 166 & 65 \\
-Label Mapping & Rows & 8.4 & 83 & 75 \\
-Label Mapping & Blocks & 8.0 & 86 & 47 \\
-Label Mapping & Full fine-tuning & 16.8 & 3,010 & 192 \\
+Label Mapping & Weights, 4.2\% & 20.7 & 8.8 & 65 \\
+Label Mapping & Full, linear layers & 497.6 & 13.8 & 59 \\
+Label Mapping & Full, all weights & 752.4 & 16.9 & 65 \\
 \midrule
-Mathematical Reasoning & Weights & 26.6 & 166 & 80 \\
-Mathematical Reasoning & Rows & 26.1 & 83 & 82 \\
-Mathematical Reasoning & Blocks & 21.4 & 73 & 53 \\
-Mathematical Reasoning & Full fine-tuning & \multicolumn{3}{c}{out of memory (40 GB)} \\
+Mathematical Reasoning & Weights, 4.2\% & 20.7 & 26.6 & 77 \\
+Mathematical Reasoning & Full, linear layers & 497.6 & \multicolumn{2}{c}{out of memory (40 GB)} \\
+Mathematical Reasoning & Full, all weights & 752.4 & \multicolumn{2}{c}{out of memory (40 GB)} \\
 \bottomrule
 \end{tabular}

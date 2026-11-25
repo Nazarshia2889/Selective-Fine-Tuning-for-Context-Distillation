@@ -409,6 +409,49 @@ def _report(results):
     print(f"{len(results) - len(fails)}/{len(results)} succeeded")
 
 
+@app.function(**{**gpu_kwargs, "timeout": 3 * 3600, "retries": 0})
+def cost_bench(task: str, specs: list[dict], repeats: int = 3) -> dict:
+    """Training time and peak memory, back to back in one container; diagnostics/cost_bench_<task>.json."""
+    from sfcd.analysis.cost_bench import run_bench
+    from sfcd.paths import write_json
+
+    paths = _setup()
+    out = run_bench(paths, specs, repeats)
+    write_json(paths.root / "diagnostics" / f"cost_bench_{task}.json", out)
+    vol.commit()
+    return {"task": task, "fast_path": out["env"]["fast_path"]}
+
+
+def _cost_bench_specs(base) -> dict[str, list[dict]]:
+    """Per task: each phase-1 share at its picked lr (one-SE rule on results/paper/phase1_runs.csv),
+    plus full fine-tuning of all parameters and of the eligible linears only."""
+    import csv
+
+    from sfcd.analysis.select_rule import picks
+    from sfcd.config import RunCfg
+
+    names = {"Knowledge": "knowledge", "Arbitrary labels": "arbitrary_labels", "Math (digit sum mod 9)": "math_methods"}
+    ctx = {"knowledge": 0, "arbitrary_labels": 0, "math_methods": 2}
+    fracs = [1e-6, 1e-5, 1e-4, 1e-3, 1e-2, 0.02]
+    rows = list(csv.DictReader(open("results/paper/phase1_runs.csv")))
+    specs: dict[str, list[dict]] = {t: [] for t in ctx}
+    for (task, fkey), s in sorted(picks(rows, ("task", "fkey")).items(), key=lambda kv: float(kv[0][1])):
+        t, f = names[task], float(fkey) / 100
+        if abs(f - 1 / 24) < 1e-4:
+            budget = {"budget_blocks": 1}
+        else:
+            budget = {"budget_frac": min(fracs, key=lambda x: abs(x - f))}
+        run = RunCfg(base=base, stage="sparsity", task=t, context_id=ctx[t], granularity="weight", lr=s["lr"], **budget)
+        specs[t].append({"label": f"weights {float(fkey):g}%", "run": run.model_dump()})
+    for scope in ("all", "eligible"):
+        b = base.model_copy(deep=True)
+        b.model.full_scope = scope
+        for t in ctx:
+            run = RunCfg(base=b, stage="granularity", task=t, context_id=ctx[t], granularity="full", lr=3e-6)
+            specs[t].append({"label": f"full ({scope})", "run": run.model_dump()})
+    return specs
+
+
 @app.local_entrypoint()
 def main(stage: str = "prep", sweep: str = "configs/sweep.yaml", overrides: str = "",
          dry_run: bool = False, limit: int = 0, force: bool = False, tasks: str = "", spawn: bool = False,
@@ -443,6 +486,12 @@ def main(stage: str = "prep", sweep: str = "configs/sweep.yaml", overrides: str 
         _report(list(train_eval.map(payload, kwargs={"git_sha": sha, "force": force}, return_exceptions=True)))
         return
 
+    if stage == "cost_bench":  # spawned, one container per task; results in diagnostics/cost_bench_<task>.json
+        for t, sp in _cost_bench_specs(base).items():
+            print(t, [x["label"] + " lr=" + str(x["run"]["lr"]) for x in sp])
+            if not dry_run:
+                print("  spawned:", cost_bench.spawn(t, sp, 3).object_id)
+        return
     if dry_run:
         print(f"stage {stage}; candidates: {cands}")
         return

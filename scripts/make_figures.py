@@ -179,42 +179,40 @@ def fig_forgetting(p1, mathrows):
 
 
 # ----------------------------------------------------------------------------- F5: efficiency
-def fig_efficiency(cost, tokens):
+def fig_efficiency(bench, tokens):
+    """Memory and time from the controlled benchmark (cost_bench.csv): mean of 3 repeats, bars = min-max."""
     fig, axes = plt.subplots(1, 3, figsize=(FULL_W, 2.2), gridspec_kw={"width_ratios": [1, 1, 0.8]})
     pos = {s: i for i, s in enumerate(SHARES)}
-    FULLX = len(SHARES)
-    for k, (ax, col, lab) in enumerate(zip(axes[:2], ["peak_mem_gb", "train_time_s"],
-                                           ["Peak GPU memory during training (GB)", "Training time (s), median"])):
-        tasks = [TASKS[0]] if col == "storage_mb" else TASKS
-        for j, t in enumerate(tasks):
-            off = 0 if col == "storage_mb" else (j - 1) * 0.12
-            c = "0.3" if col == "storage_mb" else COLOR[t]  # storage is identical for every task (8 bytes per trained weight)
+    FULL = {"Full fine-tuning (all)": (len(SHARES), "s"), "Full fine-tuning (eligible)": (len(SHARES) + 1, "^")}
+    for ax, col, lab in zip(axes[:2], ["peak_mem_gb", "train_time_s"], ["Peak GPU memory (GB)", "Training time (s)"]):
+        for j, t in enumerate(TASKS):
+            off, c = (j - 1) * 0.12, COLOR[t]
             xs, ys, lo, hi = [], [], [], []
             for s in SHARES:
-                v = sorted(float(r[col]) for r in cost if r["task"] == t and r["granularity"] == "Weights" and abs(float(r["fkey"]) - s) < 1e-3)
-                if not v:
-                    continue
-                q = st.quantiles(v, n=4) if len(v) > 1 else [v[0]] * 3
-                mid = st.median(v) if col == "train_time_s" else st.mean(v)
-                xs.append(pos[s] + off), ys.append(mid)
-                lo.append(mid - q[0] if col == "train_time_s" else 0), hi.append(q[2] - mid if col == "train_time_s" else 0)
-            ax.errorbar(xs, ys, yerr=[lo, hi] if col == "train_time_s" else None, fmt="o-", color=c, capsize=2, elinewidth=0.8,
-                        label=SHORT[t] if col != "storage_mb" else None)
-            fv = [float(r[col]) for r in cost if r["task"] == t and r["granularity"] == "Full fine-tuning"]
-            if fv:
-                ax.plot([FULLX + off], [st.median(fv)], "s", color=c, ms=4)
-            elif col == "peak_mem_gb":  # full fine-tuning did not fit on the 40 GB GPU
-                ax.plot([FULLX + off], [GPU_GB], "x", color=c, ms=6, mew=1.5)
-                ax.annotate("out of\nmemory", (FULLX + off, GPU_GB), xytext=(-4, -16), textcoords="offset points",
-                            ha="right", fontsize=6, color=c)
-        ax.set_xticks(list(range(len(SHARES))) + [FULLX], [share_label(s) for s in SHARES] + ["Full"], rotation=45, ha="right")
+                v = [float(r[col]) for r in bench if r["task"] == t and r["method"] == "Weights" and abs(float(r["fkey"]) - s) < 1e-3]
+                if v:
+                    m = st.mean(v)
+                    xs.append(pos[s] + off), ys.append(m), lo.append(m - min(v)), hi.append(max(v) - m)
+            ax.errorbar(xs, ys, yerr=[lo, hi], fmt="o-", color=c, capsize=2, elinewidth=0.8, label=SHORT[t])
+            for meth, (x, mk) in FULL.items():
+                rs = [r for r in bench if r["task"] == t and r["method"] == meth]
+                if rs and rs[0]["oom"] == "False":
+                    v = [float(r[col]) for r in rs]
+                    m = st.mean(v)
+                    ax.errorbar([x + off], [m], yerr=[[m - min(v)], [max(v) - m]], fmt=mk, color=c, ms=4, capsize=2, elinewidth=0.8)
+                elif rs and col == "peak_mem_gb":  # did not fit on the 40 GB GPU
+                    ax.plot([x + off], [GPU_GB], "x", color=c, ms=6, mew=1.5)
+        ax.set_xticks(list(range(len(SHARES))) + [v[0] for v in FULL.values()],
+                      [share_label(s) for s in SHARES] + ["Full (all)", "Full (linear)"],
+                      rotation=45, ha="right", rotation_mode="anchor")
+        ax.axvline(len(SHARES) - 0.5, color="0.75", ls=":", lw=0.7)  # shares | full fine-tuning
         ax.set_xlabel("Share of weights trained")
         ax.set_title(lab)
-        if col == "storage_mb":
-            ax.set_yscale("log")
-        elif col == "peak_mem_gb":
+        if col == "peak_mem_gb":
             ax.axhline(GPU_GB, color="0.6", ls="--", lw=0.7)
             ax.text(-0.3, GPU_GB + 0.8, "GPU limit (40 GB)", fontsize=6, color="0.4")
+            ax.annotate("out of memory", (FULL["Full fine-tuning (eligible)"][0] + 0.12, GPU_GB), xytext=(0, -14),
+                        textcoords="offset points", ha="right", fontsize=6, color=COLOR[TASKS[2]])
             ax.set_ylim(0, 45)
         else:
             ax.set_ylim(0, None)
@@ -225,17 +223,26 @@ def fig_efficiency(cost, tokens):
         o = st.mean(int(r["without_context"]) for r in tokens if r["task"] == t)
         ax.bar(i - 0.2, w, 0.38, color=COLOR[t], edgecolor="black", lw=0.4)
         ax.bar(i + 0.2, o, 0.38, color="white", edgecolor=COLOR[t], lw=1.0, hatch="////")
-        ax.text(i, w + 60, f"{w / o:.0f}x", ha="center", fontsize=7)
+        ax.text(i, w + 60, f"{w / o:.0f}\u00d7", ha="center", fontsize=7)
     ax.set_xticks(range(len(TASKS)), [SHORT[t].replace(" ", "\n", 1) for t in TASKS], fontsize=6.5)
     ax.set_title("Input tokens per query")
     from matplotlib.patches import Patch
     ax.legend_handles = [Patch(facecolor="0.55", edgecolor="black", lw=0.4, label="With context (teacher)"),
                          Patch(facecolor="white", edgecolor="0.3", hatch="////", label="Without context (student)")]
-    axes[0].plot([], [], "s", color="0.4", label="Full fine-tuning")
+    axes[0].plot([], [], "s", color="0.4", ls="none", label="Full fine-tuning, all weights")
+    axes[0].plot([], [], "^", color="0.4", ls="none", label="Full fine-tuning, linear layers only")
     fig.tight_layout(w_pad=0.8)
     h0, l0 = axes[0].get_legend_handles_labels()
     h2, l2 = ax.legend_handles, [h.get_label() for h in ax.legend_handles]
-    fig.legend(h0 + h2, l0 + l2, loc="lower center", ncol=3, frameon=False, bbox_to_anchor=(0.5, -0.14))
+    # column-major fill: tasks | full fine-tuning markers | token bars
+    from matplotlib.lines import Line2D
+    blank = Line2D([], [], ls="none")
+    task_i = [l0.index(SHORT[t]) for t in TASKS]
+    full_i = [i for i in range(len(l0)) if i not in task_i]
+    hs = [h0[i] for i in task_i] + [h0[i] for i in full_i] + [blank] + h2 + [blank]
+    ls_ = [l0[i] for i in task_i] + [l0[i] for i in full_i] + [""] + l2 + [""]
+    fig.legend(hs, ls_, loc="lower center", ncol=3, frameon=False, bbox_to_anchor=(0.5, 1.0),
+               columnspacing=1.2, handletextpad=0.5)
     save(fig, "f5_efficiency")
 
 
@@ -362,17 +369,21 @@ def table_picked(p1):
     _wt("t_picked_runs", lines)
 
 
-def table_efficiency(cost):
+def table_efficiency(bench):
+    """Controlled benchmark: mean over 3 repeats (min-max across repeats is within a few seconds)."""
+    meths = [("Weights", "Weights, 4.2\\%"), ("Full fine-tuning (eligible)", "Full, linear layers"),
+             ("Full fine-tuning (all)", "Full, all weights")]
     lines = [r"\begin{tabular}{llrrr}", r"\toprule",
-             r"Task & Method (4.2\% budget) & Peak memory (GB) & Storage (MB) & Train time (s, median) \\", r"\midrule"]
+             r"Task & Method & Trained (M) & Memory (GB) & Time (s) \\", r"\midrule"]
     for t in TASKS:
-        for g in GRANS + ["Full fine-tuning"]:
-            rs = [r for r in cost if r["task"] == t and r["granularity"] == g and (g != "Weights" or abs(float(r["fkey"]) - 4.1667) < 1e-3)]
-            if not rs:
-                lines.append(f"{SHORT[t]} & {g} & \\multicolumn{{3}}{{c}}{{out of memory (40 GB)}} \\\\")
+        for m, name in meths:
+            rs = [r for r in bench if r["task"] == t and r["method"] == m and (m != "Weights" or abs(float(r["fkey"]) - 4.1667) < 1e-3)]
+            n = float(rs[0]["n_trained"]) / 1e6
+            if rs[0]["oom"] == "True":
+                lines.append(f"{SHORT[t]} & {name} & {n:,.1f} & \\multicolumn{{2}}{{c}}{{out of memory (40 GB)}} \\\\")
                 continue
-            lines.append(f"{SHORT[t]} & {g} & {st.mean(float(r['peak_mem_gb']) for r in rs):.1f} & "
-                         f"{st.mean(float(r['storage_mb']) for r in rs):,.0f} & {st.median(float(r['train_time_s']) for r in rs):.0f} \\\\")
+            lines.append(f"{SHORT[t]} & {name} & {n:,.1f} & {st.mean(float(r['peak_mem_gb']) for r in rs):.1f} & "
+                         f"{st.mean(float(r['train_time_s']) for r in rs):.0f} \\\\")
         lines.append(r"\midrule" if t != TASKS[-1] else r"\bottomrule")
     lines.append(r"\end{tabular}")
     _wt("t3_efficiency", lines)
@@ -390,10 +401,11 @@ if __name__ == "__main__":
     fig_lr_change_forgetting(p1)
     fig_recovery(p1)
     fig_forgetting(p1, mathrows)
-    fig_efficiency(cost, load("inference_tokens.csv"))
+    bench = load("cost_bench.csv")
+    fig_efficiency(bench, load("inference_tokens.csv"))
     fig_granularity(gran)
     fig_boxplots(p1, mathrows)
     fig_loss(p1, curves)
     table_tasks(p1)
     table_picked(p1)
-    table_efficiency(cost)
+    table_efficiency(bench)
