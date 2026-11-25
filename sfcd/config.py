@@ -75,21 +75,28 @@ class BaseCfg(BaseModel):
 
 class RunCfg(BaseModel):
     base: BaseCfg
-    stage: Literal["main", "lr_tune", "smoke"] = "main"
+    stage: Literal["main", "lr_tune", "smoke", "sparsity", "granularity"] = "main"
     task: str
     context_id: int
     granularity: Granularity
-    budget_blocks: Optional[int] = None  # None for full fine-tuning
+    budget_blocks: Optional[int] = None  # None for full fine-tuning (or when budget_frac is used)
+    budget_frac: Optional[float] = None  # fraction of eligible weights (weight/row only)
     selector: Selector = "topk"
     lr: float
 
     def run_id(self) -> str:
-        blob = json.dumps(self.model_dump(), sort_keys=True)
+        # Fields added after the first sweep are dropped while unset, so earlier run ids stay valid.
+        d = self.model_dump()
+        if d.get("budget_frac") is None:
+            d.pop("budget_frac", None)
+        blob = json.dumps(d, sort_keys=True)
         return hashlib.sha1(blob.encode()).hexdigest()[:12]
 
     def name(self) -> str:
         if self.granularity == "full":
             core = "full"
+        elif self.budget_frac is not None:
+            core = f"{self.granularity}-f{self.budget_frac * 100:g}pct-{self.selector}"
         else:
             core = f"{self.granularity}-b{self.budget_blocks}-{self.selector}"
         return f"{self.task}-c{self.context_id}-{core}-lr{self.lr:g}"
@@ -104,6 +111,39 @@ class LrTuneCfg(BaseModel):
     grid: dict[str, list[float]]
 
 
+class SparsityBand(BaseModel):
+    """Budgets that share one lr grid: fractions of eligible weights and/or block-sized budgets."""
+    fractions: list[float] = []  # e.g. 0.0001 = 0.01% of eligible weights
+    blocks: list[int] = []  # budgets_blocks-style budgets (1 block ~ 4.2%)
+    lrs: list[float]
+
+
+class SparsityCfg(BaseModel):
+    """Phase 1: individual weights (top-gradient) over bands of budgets, each band with its own lr grid
+    (smaller budgets get larger lrs; neighbouring grids overlap). The lr is chosen per (task, budget) by
+    mean val accuracy over the task's contexts; MMLU forgetting is reported, not used for selection."""
+    bands: list[SparsityBand]
+
+    def lrs_for_fraction(self, f: float) -> list[float]:
+        for b in self.bands:
+            if any(abs(f - x) < 1e-12 for x in b.fractions):
+                return b.lrs
+        raise KeyError(f"fraction {f} is in no band")
+
+
+class SubsetItem(BaseModel):
+    task: str
+    context_id: int = 0
+    fractions: list[float]
+
+
+class PilotCfg(BaseModel):
+    """Cheap check before phase 1: one context per task, a few fractions, a wide lr grid."""
+    context_id: int = 0
+    fractions: list[float]
+    lrs: list[float]
+
+
 class SweepCfg(BaseModel):
     base_config: str = "configs/base.yaml"
     tasks: list[str]
@@ -113,6 +153,18 @@ class SweepCfg(BaseModel):
     include_full: bool = True
     default_lr: dict[str, float]
     lr_tune: LrTuneCfg
+    sparsity: Optional[SparsityCfg] = None
+    pilot: Optional["PilotCfg"] = None
+    range_check: list[SubsetItem] = []  # phase-1 runs (band lrs) for a few task/fraction pairs
+    granularity: Optional["GranularityCfg"] = None
+
+
+class GranularityCfg(BaseModel):
+    """Phase 2: rows and blocks at block budgets, with the same lr grid that phase 1 used for individual
+    weights at that budget (each granularity then picks its own lr by the same rule)."""
+    granularities: list[Literal["row", "block"]] = ["row", "block"]
+    blocks: list[int] = [1]
+    full_lrs: list[float] = []  # full fine-tuning reference (cost and accuracy), one run per context and lr
 
 
 # ----------------------------------------------------------------------------- loading
@@ -190,10 +242,68 @@ def expand_main(
     return runs
 
 
+def _contexts(sweep: SweepCfg, base: BaseCfg, kept: dict | None) -> list[tuple[str, int]]:
+    return [(t, c) for t in sweep.tasks for c in (kept or {}).get(t, list(range(base.data.n_keep)))]
+
+
+def _weight_run(base: BaseCfg, task: str, cid: int, lr: float, frac=None, blocks=None) -> RunCfg:
+    return RunCfg(base=base, stage="sparsity", task=task, context_id=cid, granularity="weight",
+                  budget_frac=frac, budget_blocks=blocks, selector="topk", lr=lr)
+
+
+def expand_sparsity(sweep: SweepCfg, base: BaseCfg, kept: dict | None = None) -> list[RunCfg]:
+    runs = []
+    for task, cid in _contexts(sweep, base, kept):
+        for band in sweep.sparsity.bands:
+            for lr in band.lrs:
+                runs += [_weight_run(base, task, cid, lr, frac=f) for f in band.fractions]
+                runs += [_weight_run(base, task, cid, lr, blocks=b) for b in band.blocks]
+    return runs
+
+
+def expand_pilot(sweep: SweepCfg, base: BaseCfg) -> list[RunCfg]:
+    pc = sweep.pilot
+    return [_weight_run(base, t, pc.context_id, lr, frac=f) for t in sweep.tasks for f in pc.fractions
+            for lr in pc.lrs]
+
+
+def expand_range_check(sweep: SweepCfg, base: BaseCfg) -> list[RunCfg]:
+    """Exact phase-1 runs (band lrs) for selected task/context/fraction pairs, so they're reused later."""
+    return [_weight_run(base, it.task, it.context_id, lr, frac=f) for it in sweep.range_check
+            for f in it.fractions for lr in sweep.sparsity.lrs_for_fraction(f)]
+
+
+def expand_granularity(sweep: SweepCfg, base: BaseCfg, kept: dict | None = None) -> list[RunCfg]:
+    g = sweep.granularity
+    runs = []
+    for task, cid in _contexts(sweep, base, kept):
+        for b in g.blocks:
+            band = next(bd for bd in sweep.sparsity.bands if b in bd.blocks)
+            for gran in g.granularities:
+                for lr in band.lrs:
+                    runs.append(RunCfg(base=base, stage="granularity", task=task, context_id=cid,
+                                       granularity=gran, budget_blocks=b, selector="topk", lr=lr))
+        for lr in g.full_lrs:
+            runs.append(RunCfg(base=base, stage="granularity", task=task, context_id=cid,
+                               granularity="full", budget_blocks=None, selector="none", lr=lr))
+    return runs
+
+
 def expand_stage(stage: str, sweep: SweepCfg, base: BaseCfg, state: dict) -> list[RunCfg]:
     """state: {"kept": task -> context ids, "best_lr": granularity -> lr} (either may be None)."""
     if stage == "lr_tune":
         return expand_lr_tune(sweep, base)
     if stage == "main":
         return expand_main(sweep, base, state.get("kept"), state.get("best_lr"))
+    if stage == "pilot":  # pilot runs live in results/sparsity/ and are reused by the full phase 1
+        return expand_pilot(sweep, base)
+    if stage == "sparsity":
+        return expand_sparsity(sweep, base, state.get("kept"))
+    if stage == "range_check":
+        return expand_range_check(sweep, base)
+    if stage == "granularity":
+        return expand_granularity(sweep, base, state.get("kept"))
     raise ValueError(f"unknown run stage {stage!r}")
+
+
+SweepCfg.model_rebuild()

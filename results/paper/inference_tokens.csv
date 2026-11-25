@@ -1,0 +1,1701 @@
+task,context,with_context,without_context
+Knowledge,0,688,49
+Knowledge,0,690,51
+Knowledge,0,685,46
+Knowledge,0,684,45
+Knowledge,0,686,47
+Knowledge,0,686,47
+Knowledge,0,689,50
+Knowledge,0,690,51
+Knowledge,0,687,48
+Knowledge,0,690,51
+Knowledge,0,687,48
+Knowledge,0,690,51
+Knowledge,0,691,52
+Knowledge,0,689,50
+Knowledge,0,692,53
+Knowledge,0,687,48
+Knowledge,0,691,52
+Knowledge,0,690,51
+Knowledge,0,690,51
+Knowledge,0,689,50
+Knowledge,0,685,46
+Knowledge,0,687,48
+Knowledge,0,689,50
+Knowledge,0,686,47
+Knowledge,0,687,48
+Knowledge,0,686,47
+Knowledge,0,686,47
+Knowledge,0,688,49
+Knowledge,0,689,50
+Knowledge,0,684,45
+Knowledge,0,688,49
+Knowledge,0,688,49
+Knowledge,0,687,48
+Knowledge,0,686,47
+Knowledge,0,686,47
+Knowledge,0,686,47
+Knowledge,0,688,49
+Knowledge,0,689,50
+Knowledge,0,686,47
+Knowledge,0,689,50
+Knowledge,0,686,47
+Knowledge,0,686,47
+Knowledge,0,690,51
+Knowledge,0,690,51
+Knowledge,0,686,47
+Knowledge,0,686,47
+Knowledge,0,686,47
+Knowledge,0,687,48
+Knowledge,0,685,46
+Knowledge,0,693,54
+Knowledge,0,684,45
+Knowledge,0,688,49
+Knowledge,0,689,50
+Knowledge,0,687,48
+Knowledge,0,687,48
+Knowledge,0,685,46
+Knowledge,0,688,49
+Knowledge,0,687,48
+Knowledge,0,687,48
+Knowledge,0,691,52
+Knowledge,0,688,49
+Knowledge,0,685,46
+Knowledge,0,685,46
+Knowledge,0,687,48
+Knowledge,0,689,50
+Knowledge,0,685,46
+Knowledge,0,691,52
+Knowledge,0,688,49
+Knowledge,0,691,52
+Knowledge,0,687,48
+Knowledge,0,685,46
+Knowledge,0,685,46
+Knowledge,0,687,48
+Knowledge,0,688,49
+Knowledge,0,688,49
+Knowledge,0,688,49
+Knowledge,0,689,50
+Knowledge,0,689,50
+Knowledge,0,687,48
+Knowledge,0,689,50
+Knowledge,0,688,49
+Knowledge,0,689,50
+Knowledge,0,685,46
+Knowledge,0,689,50
+Knowledge,0,688,49
+Knowledge,0,689,50
+Knowledge,0,688,49
+Knowledge,0,688,49
+Knowledge,0,690,51
+Knowledge,0,688,49
+Knowledge,0,690,51
+Knowledge,0,686,47
+Knowledge,0,691,52
+Knowledge,0,691,52
+Knowledge,0,690,51
+Knowledge,0,693,54
+Knowledge,0,688,49
+Knowledge,0,687,48
+Knowledge,0,687,48
+Knowledge,0,689,50
+Knowledge,0,689,50
+Knowledge,0,688,49
+Knowledge,0,686,47
+Knowledge,0,689,50
+Knowledge,0,685,46
+Knowledge,0,685,46
+Knowledge,0,687,48
+Knowledge,0,685,46
+Knowledge,0,690,51
+Knowledge,0,691,52
+Knowledge,0,687,48
+Knowledge,0,688,49
+Knowledge,0,687,48
+Knowledge,0,687,48
+Knowledge,0,689,50
+Knowledge,0,685,46
+Knowledge,0,687,48
+Knowledge,0,684,45
+Knowledge,0,688,49
+Knowledge,0,688,49
+Knowledge,0,685,46
+Knowledge,0,689,50
+Knowledge,0,689,50
+Knowledge,0,687,48
+Knowledge,0,690,51
+Knowledge,0,690,51
+Knowledge,0,687,48
+Knowledge,0,684,45
+Knowledge,0,687,48
+Knowledge,0,689,50
+Knowledge,0,692,53
+Knowledge,0,690,51
+Knowledge,0,686,47
+Knowledge,0,689,50
+Knowledge,0,689,50
+Knowledge,0,687,48
+Knowledge,0,689,50
+Knowledge,0,691,52
+Knowledge,0,687,48
+Knowledge,0,686,47
+Knowledge,0,687,48
+Knowledge,0,687,48
+Knowledge,0,688,49
+Knowledge,0,689,50
+Knowledge,0,685,46
+Knowledge,0,685,46
+Knowledge,0,685,46
+Knowledge,0,686,47
+Knowledge,0,689,50
+Knowledge,0,688,49
+Knowledge,0,690,51
+Knowledge,0,689,50
+Knowledge,0,687,48
+Knowledge,0,686,47
+Knowledge,0,685,46
+Knowledge,0,689,50
+Knowledge,0,692,53
+Knowledge,0,687,48
+Knowledge,0,685,46
+Knowledge,0,686,47
+Knowledge,0,685,46
+Knowledge,0,690,51
+Knowledge,0,689,50
+Knowledge,0,687,48
+Knowledge,0,688,49
+Knowledge,0,689,50
+Knowledge,0,692,53
+Knowledge,0,686,47
+Knowledge,0,686,47
+Knowledge,0,690,51
+Knowledge,0,694,55
+Knowledge,0,691,52
+Knowledge,0,684,45
+Knowledge,0,692,53
+Knowledge,0,688,49
+Knowledge,0,688,49
+Knowledge,0,687,48
+Knowledge,0,689,50
+Knowledge,0,687,48
+Knowledge,0,689,50
+Knowledge,0,687,48
+Knowledge,0,690,51
+Knowledge,0,688,49
+Knowledge,0,689,50
+Knowledge,0,685,46
+Knowledge,0,691,52
+Knowledge,0,688,49
+Knowledge,0,685,46
+Knowledge,0,691,52
+Knowledge,0,690,51
+Knowledge,0,688,49
+Knowledge,0,684,45
+Knowledge,0,687,48
+Knowledge,0,685,46
+Knowledge,0,688,49
+Knowledge,0,687,48
+Knowledge,0,688,49
+Knowledge,0,690,51
+Knowledge,0,688,49
+Knowledge,0,691,52
+Knowledge,1,695,53
+Knowledge,1,692,50
+Knowledge,1,690,48
+Knowledge,1,689,47
+Knowledge,1,695,53
+Knowledge,1,689,47
+Knowledge,1,692,50
+Knowledge,1,694,52
+Knowledge,1,690,48
+Knowledge,1,692,50
+Knowledge,1,691,49
+Knowledge,1,689,47
+Knowledge,1,691,49
+Knowledge,1,691,49
+Knowledge,1,691,49
+Knowledge,1,693,51
+Knowledge,1,691,49
+Knowledge,1,692,50
+Knowledge,1,694,52
+Knowledge,1,693,51
+Knowledge,1,688,46
+Knowledge,1,693,51
+Knowledge,1,690,48
+Knowledge,1,692,50
+Knowledge,1,691,49
+Knowledge,1,696,54
+Knowledge,1,689,47
+Knowledge,1,693,51
+Knowledge,1,691,49
+Knowledge,1,691,49
+Knowledge,1,689,47
+Knowledge,1,689,47
+Knowledge,1,691,49
+Knowledge,1,690,48
+Knowledge,1,693,51
+Knowledge,1,690,48
+Knowledge,1,694,52
+Knowledge,1,690,48
+Knowledge,1,691,49
+Knowledge,1,689,47
+Knowledge,1,692,50
+Knowledge,1,693,51
+Knowledge,1,694,52
+Knowledge,1,689,47
+Knowledge,1,692,50
+Knowledge,1,691,49
+Knowledge,1,688,46
+Knowledge,1,694,52
+Knowledge,1,692,50
+Knowledge,1,689,47
+Knowledge,1,693,51
+Knowledge,1,689,47
+Knowledge,1,695,53
+Knowledge,1,689,47
+Knowledge,1,695,53
+Knowledge,1,689,47
+Knowledge,1,688,46
+Knowledge,1,690,48
+Knowledge,1,690,48
+Knowledge,1,687,45
+Knowledge,1,687,45
+Knowledge,1,692,50
+Knowledge,1,695,53
+Knowledge,1,692,50
+Knowledge,1,692,50
+Knowledge,1,690,48
+Knowledge,1,691,49
+Knowledge,1,692,50
+Knowledge,1,693,51
+Knowledge,1,688,46
+Knowledge,1,693,51
+Knowledge,1,691,49
+Knowledge,1,688,46
+Knowledge,1,690,48
+Knowledge,1,694,52
+Knowledge,1,690,48
+Knowledge,1,690,48
+Knowledge,1,689,47
+Knowledge,1,690,48
+Knowledge,1,694,52
+Knowledge,1,690,48
+Knowledge,1,691,49
+Knowledge,1,691,49
+Knowledge,1,690,48
+Knowledge,1,694,52
+Knowledge,1,691,49
+Knowledge,1,692,50
+Knowledge,1,691,49
+Knowledge,1,693,51
+Knowledge,1,690,48
+Knowledge,1,692,50
+Knowledge,1,691,49
+Knowledge,1,692,50
+Knowledge,1,693,51
+Knowledge,1,694,52
+Knowledge,1,693,51
+Knowledge,1,689,47
+Knowledge,1,694,52
+Knowledge,1,690,48
+Knowledge,1,691,49
+Knowledge,1,692,50
+Knowledge,1,695,53
+Knowledge,1,692,50
+Knowledge,1,692,50
+Knowledge,1,689,47
+Knowledge,1,694,52
+Knowledge,1,690,48
+Knowledge,1,691,49
+Knowledge,1,691,49
+Knowledge,1,692,50
+Knowledge,1,693,51
+Knowledge,1,688,46
+Knowledge,1,689,47
+Knowledge,1,692,50
+Knowledge,1,691,49
+Knowledge,1,690,48
+Knowledge,1,689,47
+Knowledge,1,691,49
+Knowledge,1,688,46
+Knowledge,1,688,46
+Knowledge,1,691,49
+Knowledge,1,688,46
+Knowledge,1,691,49
+Knowledge,1,688,46
+Knowledge,1,691,49
+Knowledge,1,691,49
+Knowledge,1,691,49
+Knowledge,1,693,51
+Knowledge,1,690,48
+Knowledge,1,691,49
+Knowledge,1,693,51
+Knowledge,1,690,48
+Knowledge,1,692,50
+Knowledge,1,694,52
+Knowledge,1,688,46
+Knowledge,1,691,49
+Knowledge,1,690,48
+Knowledge,1,688,46
+Knowledge,1,692,50
+Knowledge,1,693,51
+Knowledge,1,692,50
+Knowledge,1,691,49
+Knowledge,1,690,48
+Knowledge,1,691,49
+Knowledge,1,691,49
+Knowledge,1,690,48
+Knowledge,1,690,48
+Knowledge,1,689,47
+Knowledge,1,691,49
+Knowledge,1,690,48
+Knowledge,1,693,51
+Knowledge,1,689,47
+Knowledge,1,692,50
+Knowledge,1,689,47
+Knowledge,1,692,50
+Knowledge,1,691,49
+Knowledge,1,692,50
+Knowledge,1,694,52
+Knowledge,1,691,49
+Knowledge,1,688,46
+Knowledge,1,689,47
+Knowledge,1,690,48
+Knowledge,1,695,53
+Knowledge,1,691,49
+Knowledge,1,687,45
+Knowledge,1,691,49
+Knowledge,1,688,46
+Knowledge,1,691,49
+Knowledge,1,691,49
+Knowledge,1,692,50
+Knowledge,1,692,50
+Knowledge,1,692,50
+Knowledge,1,690,48
+Knowledge,1,690,48
+Knowledge,1,689,47
+Knowledge,1,688,46
+Knowledge,1,691,49
+Knowledge,1,693,51
+Knowledge,1,690,48
+Knowledge,1,689,47
+Knowledge,1,691,49
+Knowledge,1,693,51
+Knowledge,1,690,48
+Knowledge,1,692,50
+Knowledge,1,691,49
+Knowledge,1,694,52
+Knowledge,1,693,51
+Knowledge,1,689,47
+Knowledge,1,690,48
+Knowledge,1,690,48
+Knowledge,1,693,51
+Knowledge,1,689,47
+Knowledge,1,693,51
+Knowledge,1,691,49
+Knowledge,1,694,52
+Knowledge,1,688,46
+Knowledge,1,693,51
+Knowledge,1,693,51
+Knowledge,1,690,48
+Knowledge,1,697,55
+Knowledge,2,685,49
+Knowledge,2,686,50
+Knowledge,2,683,47
+Knowledge,2,687,51
+Knowledge,2,688,52
+Knowledge,2,683,47
+Knowledge,2,685,49
+Knowledge,2,682,46
+Knowledge,2,684,48
+Knowledge,2,687,51
+Knowledge,2,681,45
+Knowledge,2,684,48
+Knowledge,2,685,49
+Knowledge,2,687,51
+Knowledge,2,683,47
+Knowledge,2,685,49
+Knowledge,2,687,51
+Knowledge,2,684,48
+Knowledge,2,682,46
+Knowledge,2,688,52
+Knowledge,2,683,47
+Knowledge,2,681,45
+Knowledge,2,681,45
+Knowledge,2,688,52
+Knowledge,2,683,47
+Knowledge,2,683,47
+Knowledge,2,691,55
+Knowledge,2,683,47
+Knowledge,2,682,46
+Knowledge,2,685,49
+Knowledge,2,682,46
+Knowledge,2,688,52
+Knowledge,2,686,50
+Knowledge,2,686,50
+Knowledge,2,688,52
+Knowledge,2,686,50
+Knowledge,2,684,48
+Knowledge,2,684,48
+Knowledge,2,689,53
+Knowledge,2,686,50
+Knowledge,2,688,52
+Knowledge,2,683,47
+Knowledge,2,682,46
+Knowledge,2,687,51
+Knowledge,2,685,49
+Knowledge,2,685,49
+Knowledge,2,683,47
+Knowledge,2,689,53
+Knowledge,2,686,50
+Knowledge,2,687,51
+Knowledge,2,685,49
+Knowledge,2,682,46
+Knowledge,2,683,47
+Knowledge,2,687,51
+Knowledge,2,686,50
+Knowledge,2,685,49
+Knowledge,2,683,47
+Knowledge,2,688,52
+Knowledge,2,684,48
+Knowledge,2,685,49
+Knowledge,2,684,48
+Knowledge,2,684,48
+Knowledge,2,685,49
+Knowledge,2,687,51
+Knowledge,2,685,49
+Knowledge,2,687,51
+Knowledge,2,684,48
+Knowledge,2,683,47
+Knowledge,2,685,49
+Knowledge,2,686,50
+Knowledge,2,684,48
+Knowledge,2,685,49
+Knowledge,2,687,51
+Knowledge,2,685,49
+Knowledge,2,685,49
+Knowledge,2,686,50
+Knowledge,2,685,49
+Knowledge,2,685,49
+Knowledge,2,687,51
+Knowledge,2,683,47
+Knowledge,2,684,48
+Knowledge,2,684,48
+Knowledge,2,687,51
+Knowledge,2,687,51
+Knowledge,2,686,50
+Knowledge,2,682,46
+Knowledge,2,681,45
+Knowledge,2,685,49
+Knowledge,2,682,46
+Knowledge,2,689,53
+Knowledge,2,686,50
+Knowledge,2,686,50
+Knowledge,2,682,46
+Knowledge,2,686,50
+Knowledge,2,685,49
+Knowledge,2,684,48
+Knowledge,2,686,50
+Knowledge,2,683,47
+Knowledge,2,683,47
+Knowledge,2,682,46
+Knowledge,2,685,49
+Knowledge,2,688,52
+Knowledge,2,686,50
+Knowledge,2,682,46
+Knowledge,2,685,49
+Knowledge,2,690,54
+Knowledge,2,684,48
+Knowledge,2,684,48
+Knowledge,2,689,53
+Knowledge,2,684,48
+Knowledge,2,684,48
+Knowledge,2,685,49
+Knowledge,2,687,51
+Knowledge,2,683,47
+Knowledge,2,687,51
+Knowledge,2,685,49
+Knowledge,2,683,47
+Knowledge,2,684,48
+Knowledge,2,685,49
+Knowledge,2,687,51
+Knowledge,2,682,46
+Knowledge,2,684,48
+Knowledge,2,686,50
+Knowledge,2,683,47
+Knowledge,2,685,49
+Knowledge,2,684,48
+Knowledge,2,683,47
+Knowledge,2,685,49
+Knowledge,2,687,51
+Knowledge,2,682,46
+Knowledge,2,686,50
+Knowledge,2,684,48
+Knowledge,2,685,49
+Knowledge,2,684,48
+Knowledge,2,684,48
+Knowledge,2,689,53
+Knowledge,2,683,47
+Knowledge,2,684,48
+Knowledge,2,684,48
+Knowledge,2,687,51
+Knowledge,2,685,49
+Knowledge,2,685,49
+Knowledge,2,683,47
+Knowledge,2,683,47
+Knowledge,2,688,52
+Knowledge,2,682,46
+Knowledge,2,682,46
+Knowledge,2,685,49
+Knowledge,2,687,51
+Knowledge,2,684,48
+Knowledge,2,685,49
+Knowledge,2,683,47
+Knowledge,2,688,52
+Knowledge,2,689,53
+Knowledge,2,682,46
+Knowledge,2,684,48
+Knowledge,2,685,49
+Knowledge,2,683,47
+Knowledge,2,684,48
+Knowledge,2,684,48
+Knowledge,2,687,51
+Knowledge,2,689,53
+Knowledge,2,687,51
+Knowledge,2,686,50
+Knowledge,2,682,46
+Knowledge,2,685,49
+Knowledge,2,683,47
+Knowledge,2,686,50
+Knowledge,2,682,46
+Knowledge,2,684,48
+Knowledge,2,685,49
+Knowledge,2,686,50
+Knowledge,2,687,51
+Knowledge,2,682,46
+Knowledge,2,685,49
+Knowledge,2,684,48
+Knowledge,2,681,45
+Knowledge,2,686,50
+Knowledge,2,684,48
+Knowledge,2,685,49
+Knowledge,2,685,49
+Knowledge,2,687,51
+Knowledge,2,686,50
+Knowledge,2,686,50
+Knowledge,2,682,46
+Knowledge,2,686,50
+Knowledge,2,681,45
+Knowledge,2,684,48
+Knowledge,2,684,48
+Knowledge,2,683,47
+Knowledge,2,684,48
+Knowledge,2,681,45
+Knowledge,2,684,48
+Knowledge,2,683,47
+Knowledge,2,684,48
+Knowledge,2,685,49
+Knowledge,2,685,49
+Knowledge,2,684,48
+Knowledge,2,686,50
+Knowledge,2,684,48
+Arbitrary labels,0,1889,104
+Arbitrary labels,0,1866,81
+Arbitrary labels,0,1866,81
+Arbitrary labels,0,1876,91
+Arbitrary labels,0,1860,75
+Arbitrary labels,0,1920,135
+Arbitrary labels,0,1859,74
+Arbitrary labels,0,1880,95
+Arbitrary labels,0,1875,90
+Arbitrary labels,0,1854,69
+Arbitrary labels,0,1861,76
+Arbitrary labels,0,1849,64
+Arbitrary labels,0,1873,88
+Arbitrary labels,0,1876,91
+Arbitrary labels,0,1866,81
+Arbitrary labels,0,1875,90
+Arbitrary labels,0,1900,115
+Arbitrary labels,0,1861,76
+Arbitrary labels,0,1874,89
+Arbitrary labels,0,1863,78
+Arbitrary labels,0,1877,92
+Arbitrary labels,0,1873,88
+Arbitrary labels,0,1875,90
+Arbitrary labels,0,1858,73
+Arbitrary labels,0,1860,75
+Arbitrary labels,0,1862,77
+Arbitrary labels,0,1886,101
+Arbitrary labels,0,1881,96
+Arbitrary labels,0,1858,73
+Arbitrary labels,0,1854,69
+Arbitrary labels,0,1876,91
+Arbitrary labels,0,1864,79
+Arbitrary labels,0,1850,65
+Arbitrary labels,0,1860,75
+Arbitrary labels,0,1864,79
+Arbitrary labels,0,1853,68
+Arbitrary labels,0,1871,86
+Arbitrary labels,0,1862,77
+Arbitrary labels,0,1863,78
+Arbitrary labels,0,1855,70
+Arbitrary labels,0,1859,74
+Arbitrary labels,0,1867,82
+Arbitrary labels,0,1864,79
+Arbitrary labels,0,1873,88
+Arbitrary labels,0,1861,76
+Arbitrary labels,0,1870,85
+Arbitrary labels,0,1874,89
+Arbitrary labels,0,1873,88
+Arbitrary labels,0,1871,86
+Arbitrary labels,0,1880,95
+Arbitrary labels,0,1856,71
+Arbitrary labels,0,1868,83
+Arbitrary labels,0,1871,86
+Arbitrary labels,0,1874,89
+Arbitrary labels,0,1861,76
+Arbitrary labels,0,1851,66
+Arbitrary labels,0,1870,85
+Arbitrary labels,0,1846,61
+Arbitrary labels,0,1869,84
+Arbitrary labels,0,1867,82
+Arbitrary labels,0,1862,77
+Arbitrary labels,0,1872,87
+Arbitrary labels,0,1870,85
+Arbitrary labels,0,1867,82
+Arbitrary labels,0,1894,109
+Arbitrary labels,0,1863,78
+Arbitrary labels,0,1880,95
+Arbitrary labels,0,1858,73
+Arbitrary labels,0,1876,91
+Arbitrary labels,0,1853,68
+Arbitrary labels,0,1889,104
+Arbitrary labels,0,1855,70
+Arbitrary labels,0,1883,98
+Arbitrary labels,0,1890,105
+Arbitrary labels,0,1856,71
+Arbitrary labels,0,1866,81
+Arbitrary labels,0,1867,82
+Arbitrary labels,0,1864,79
+Arbitrary labels,0,1851,66
+Arbitrary labels,0,1873,88
+Arbitrary labels,0,1866,81
+Arbitrary labels,0,1882,97
+Arbitrary labels,0,1875,90
+Arbitrary labels,0,1865,80
+Arbitrary labels,0,1863,78
+Arbitrary labels,0,1872,87
+Arbitrary labels,0,1864,79
+Arbitrary labels,0,1850,65
+Arbitrary labels,0,1872,87
+Arbitrary labels,0,1885,100
+Arbitrary labels,0,1849,64
+Arbitrary labels,0,1887,102
+Arbitrary labels,0,1864,79
+Arbitrary labels,0,1874,89
+Arbitrary labels,0,1876,91
+Arbitrary labels,0,1885,100
+Arbitrary labels,0,1867,82
+Arbitrary labels,0,1934,149
+Arbitrary labels,0,1872,87
+Arbitrary labels,0,1981,196
+Arbitrary labels,0,1857,72
+Arbitrary labels,0,1851,66
+Arbitrary labels,0,1860,75
+Arbitrary labels,0,1857,72
+Arbitrary labels,0,1890,105
+Arbitrary labels,0,1866,81
+Arbitrary labels,0,1890,105
+Arbitrary labels,0,1864,79
+Arbitrary labels,0,1881,96
+Arbitrary labels,0,1856,71
+Arbitrary labels,0,1839,54
+Arbitrary labels,0,1873,88
+Arbitrary labels,0,1850,65
+Arbitrary labels,0,1899,114
+Arbitrary labels,0,1861,76
+Arbitrary labels,0,1850,65
+Arbitrary labels,0,1870,85
+Arbitrary labels,0,1881,96
+Arbitrary labels,0,1837,52
+Arbitrary labels,0,1874,89
+Arbitrary labels,0,1867,82
+Arbitrary labels,0,1875,90
+Arbitrary labels,0,1848,63
+Arbitrary labels,0,1858,73
+Arbitrary labels,0,1861,76
+Arbitrary labels,0,1865,80
+Arbitrary labels,0,1854,69
+Arbitrary labels,0,1879,94
+Arbitrary labels,0,1880,95
+Arbitrary labels,0,1878,93
+Arbitrary labels,0,1862,77
+Arbitrary labels,0,1869,84
+Arbitrary labels,0,1846,61
+Arbitrary labels,0,1847,62
+Arbitrary labels,0,1866,81
+Arbitrary labels,0,1870,85
+Arbitrary labels,0,1934,149
+Arbitrary labels,0,1876,91
+Arbitrary labels,0,1855,70
+Arbitrary labels,0,1881,96
+Arbitrary labels,0,1876,91
+Arbitrary labels,0,1850,65
+Arbitrary labels,0,1865,80
+Arbitrary labels,0,1868,83
+Arbitrary labels,0,1868,83
+Arbitrary labels,0,1854,69
+Arbitrary labels,0,1861,76
+Arbitrary labels,0,1906,121
+Arbitrary labels,0,1871,86
+Arbitrary labels,0,1862,77
+Arbitrary labels,0,1851,66
+Arbitrary labels,0,1861,76
+Arbitrary labels,0,1858,73
+Arbitrary labels,0,1854,69
+Arbitrary labels,0,1860,75
+Arbitrary labels,0,1883,98
+Arbitrary labels,0,1863,78
+Arbitrary labels,0,1878,93
+Arbitrary labels,0,1860,75
+Arbitrary labels,0,1863,78
+Arbitrary labels,0,1864,79
+Arbitrary labels,0,1855,70
+Arbitrary labels,0,1879,94
+Arbitrary labels,0,1854,69
+Arbitrary labels,0,1863,78
+Arbitrary labels,0,1863,78
+Arbitrary labels,0,1864,79
+Arbitrary labels,0,1845,60
+Arbitrary labels,0,1888,103
+Arbitrary labels,0,1879,94
+Arbitrary labels,0,1870,85
+Arbitrary labels,0,1872,87
+Arbitrary labels,0,1868,83
+Arbitrary labels,0,1873,88
+Arbitrary labels,0,1862,77
+Arbitrary labels,0,1877,92
+Arbitrary labels,0,1885,100
+Arbitrary labels,0,1878,93
+Arbitrary labels,0,1868,83
+Arbitrary labels,0,1865,80
+Arbitrary labels,0,1886,101
+Arbitrary labels,0,1874,89
+Arbitrary labels,0,1864,79
+Arbitrary labels,0,1868,83
+Arbitrary labels,0,1859,74
+Arbitrary labels,0,1883,98
+Arbitrary labels,0,1878,93
+Arbitrary labels,0,1876,91
+Arbitrary labels,0,1862,77
+Arbitrary labels,0,1867,82
+Arbitrary labels,0,1863,78
+Arbitrary labels,0,1867,82
+Arbitrary labels,0,1863,78
+Arbitrary labels,0,1884,99
+Arbitrary labels,0,1866,81
+Arbitrary labels,0,1864,79
+Arbitrary labels,0,1844,59
+Arbitrary labels,0,1865,80
+Arbitrary labels,0,1874,89
+Arbitrary labels,0,1879,94
+Arbitrary labels,2,2429,104
+Arbitrary labels,2,2399,74
+Arbitrary labels,2,2408,83
+Arbitrary labels,2,2382,57
+Arbitrary labels,2,2458,133
+Arbitrary labels,2,2399,74
+Arbitrary labels,2,2432,107
+Arbitrary labels,2,2375,50
+Arbitrary labels,2,2414,89
+Arbitrary labels,2,2398,73
+Arbitrary labels,2,2415,90
+Arbitrary labels,2,2433,108
+Arbitrary labels,2,2404,79
+Arbitrary labels,2,2394,69
+Arbitrary labels,2,2419,94
+Arbitrary labels,2,2373,48
+Arbitrary labels,2,2426,101
+Arbitrary labels,2,2447,122
+Arbitrary labels,2,2400,75
+Arbitrary labels,2,2433,108
+Arbitrary labels,2,2413,88
+Arbitrary labels,2,2425,100
+Arbitrary labels,2,2391,66
+Arbitrary labels,2,2405,80
+Arbitrary labels,2,2436,111
+Arbitrary labels,2,2414,89
+Arbitrary labels,2,2439,114
+Arbitrary labels,2,2450,125
+Arbitrary labels,2,2388,63
+Arbitrary labels,2,2419,94
+Arbitrary labels,2,2392,67
+Arbitrary labels,2,2443,118
+Arbitrary labels,2,2385,60
+Arbitrary labels,2,2424,99
+Arbitrary labels,2,2410,85
+Arbitrary labels,2,2393,68
+Arbitrary labels,2,2427,102
+Arbitrary labels,2,2391,66
+Arbitrary labels,2,2404,79
+Arbitrary labels,2,2408,83
+Arbitrary labels,2,2383,58
+Arbitrary labels,2,2431,106
+Arbitrary labels,2,2419,94
+Arbitrary labels,2,2427,102
+Arbitrary labels,2,2443,118
+Arbitrary labels,2,2401,76
+Arbitrary labels,2,2388,63
+Arbitrary labels,2,2426,101
+Arbitrary labels,2,2426,101
+Arbitrary labels,2,2448,123
+Arbitrary labels,2,2434,109
+Arbitrary labels,2,2400,75
+Arbitrary labels,2,2430,105
+Arbitrary labels,2,2426,101
+Arbitrary labels,2,2401,76
+Arbitrary labels,2,2437,112
+Arbitrary labels,2,2451,126
+Arbitrary labels,2,2439,114
+Arbitrary labels,2,2394,69
+Arbitrary labels,2,2399,74
+Arbitrary labels,2,2456,131
+Arbitrary labels,2,2416,91
+Arbitrary labels,2,2449,124
+Arbitrary labels,2,2444,119
+Arbitrary labels,2,2433,108
+Arbitrary labels,2,2386,61
+Arbitrary labels,2,2396,71
+Arbitrary labels,2,2441,116
+Arbitrary labels,2,2412,87
+Arbitrary labels,2,2437,112
+Arbitrary labels,2,2404,79
+Arbitrary labels,2,2444,119
+Arbitrary labels,2,2417,92
+Arbitrary labels,2,2433,108
+Arbitrary labels,2,2399,74
+Arbitrary labels,2,2405,80
+Arbitrary labels,2,2423,98
+Arbitrary labels,2,2401,76
+Arbitrary labels,2,2441,116
+Arbitrary labels,2,2424,99
+Arbitrary labels,2,2392,67
+Arbitrary labels,2,2396,71
+Arbitrary labels,2,2398,73
+Arbitrary labels,2,2439,114
+Arbitrary labels,2,2438,113
+Arbitrary labels,2,2440,115
+Arbitrary labels,2,2389,64
+Arbitrary labels,2,2390,65
+Arbitrary labels,2,2447,122
+Arbitrary labels,2,2440,115
+Arbitrary labels,2,2456,131
+Arbitrary labels,2,2441,116
+Arbitrary labels,2,2395,70
+Arbitrary labels,2,2409,84
+Arbitrary labels,2,2402,77
+Arbitrary labels,2,2391,66
+Arbitrary labels,2,2388,63
+Arbitrary labels,2,2396,71
+Arbitrary labels,2,2430,105
+Arbitrary labels,2,2392,67
+Arbitrary labels,2,2400,75
+Arbitrary labels,2,2407,82
+Arbitrary labels,2,2429,104
+Arbitrary labels,2,2480,155
+Arbitrary labels,2,2387,62
+Arbitrary labels,2,2387,62
+Arbitrary labels,2,2402,77
+Arbitrary labels,2,2416,91
+Arbitrary labels,2,2420,95
+Arbitrary labels,2,2426,101
+Arbitrary labels,2,2377,52
+Arbitrary labels,2,2419,94
+Arbitrary labels,2,2409,84
+Arbitrary labels,2,2397,72
+Arbitrary labels,2,2397,72
+Arbitrary labels,2,2434,109
+Arbitrary labels,2,2429,104
+Arbitrary labels,2,2404,79
+Arbitrary labels,2,2390,65
+Arbitrary labels,2,2398,73
+Arbitrary labels,2,2436,111
+Arbitrary labels,2,2405,80
+Arbitrary labels,2,2410,85
+Arbitrary labels,2,2442,117
+Arbitrary labels,2,2390,65
+Arbitrary labels,2,2424,99
+Arbitrary labels,2,2405,80
+Arbitrary labels,2,2454,129
+Arbitrary labels,2,2436,111
+Arbitrary labels,2,2416,91
+Arbitrary labels,2,2437,112
+Arbitrary labels,2,2419,94
+Arbitrary labels,2,2401,76
+Arbitrary labels,2,2466,141
+Arbitrary labels,2,2424,99
+Arbitrary labels,2,2425,100
+Arbitrary labels,2,2386,61
+Arbitrary labels,2,2450,125
+Arbitrary labels,2,2430,105
+Arbitrary labels,2,2384,59
+Arbitrary labels,2,2425,100
+Arbitrary labels,2,2384,59
+Arbitrary labels,2,2442,117
+Arbitrary labels,2,2402,77
+Arbitrary labels,2,2428,103
+Arbitrary labels,2,2435,110
+Arbitrary labels,2,2435,110
+Arbitrary labels,2,2406,81
+Arbitrary labels,2,2438,113
+Arbitrary labels,2,2428,103
+Arbitrary labels,2,2420,95
+Arbitrary labels,2,2394,69
+Arbitrary labels,2,2421,96
+Arbitrary labels,2,2433,108
+Arbitrary labels,2,2389,64
+Arbitrary labels,2,2380,55
+Arbitrary labels,2,2427,102
+Arbitrary labels,2,2435,110
+Arbitrary labels,2,2420,95
+Arbitrary labels,2,2432,107
+Arbitrary labels,2,2390,65
+Arbitrary labels,2,2384,59
+Arbitrary labels,2,2383,58
+Arbitrary labels,2,2393,68
+Arbitrary labels,2,2426,101
+Arbitrary labels,2,2407,82
+Arbitrary labels,2,2389,64
+Arbitrary labels,2,2434,109
+Arbitrary labels,2,2431,106
+Arbitrary labels,2,2416,91
+Arbitrary labels,2,2400,75
+Arbitrary labels,2,2385,60
+Arbitrary labels,2,2408,83
+Arbitrary labels,2,2400,75
+Arbitrary labels,2,2407,82
+Arbitrary labels,2,2408,83
+Arbitrary labels,2,2426,101
+Arbitrary labels,2,2411,86
+Arbitrary labels,2,2430,105
+Arbitrary labels,2,2418,93
+Arbitrary labels,2,2408,83
+Arbitrary labels,2,2407,82
+Arbitrary labels,2,2435,110
+Arbitrary labels,2,2403,78
+Arbitrary labels,2,2393,68
+Arbitrary labels,2,2426,101
+Arbitrary labels,2,2406,81
+Arbitrary labels,2,2396,71
+Arbitrary labels,2,2426,101
+Arbitrary labels,2,2428,103
+Arbitrary labels,2,2387,62
+Arbitrary labels,2,2395,70
+Arbitrary labels,2,2436,111
+Arbitrary labels,2,2442,117
+Arbitrary labels,2,2399,74
+Arbitrary labels,2,2411,86
+Arbitrary labels,2,2433,108
+Arbitrary labels,2,2405,80
+Arbitrary labels,2,2440,115
+Arbitrary labels,2,2405,80
+Arbitrary labels,3,2417,75
+Arbitrary labels,3,2396,54
+Arbitrary labels,3,2430,88
+Arbitrary labels,3,2412,70
+Arbitrary labels,3,2454,112
+Arbitrary labels,3,2425,83
+Arbitrary labels,3,2456,114
+Arbitrary labels,3,2446,104
+Arbitrary labels,3,2401,59
+Arbitrary labels,3,2425,83
+Arbitrary labels,3,2415,73
+Arbitrary labels,3,2465,123
+Arbitrary labels,3,2422,80
+Arbitrary labels,3,2399,57
+Arbitrary labels,3,2462,120
+Arbitrary labels,3,2478,136
+Arbitrary labels,3,2414,72
+Arbitrary labels,3,2434,92
+Arbitrary labels,3,2404,62
+Arbitrary labels,3,2404,62
+Arbitrary labels,3,2454,112
+Arbitrary labels,3,2431,89
+Arbitrary labels,3,2448,106
+Arbitrary labels,3,2404,62
+Arbitrary labels,3,2418,76
+Arbitrary labels,3,2399,57
+Arbitrary labels,3,2461,119
+Arbitrary labels,3,2437,95
+Arbitrary labels,3,2450,108
+Arbitrary labels,3,2440,98
+Arbitrary labels,3,2458,116
+Arbitrary labels,3,2408,66
+Arbitrary labels,3,2452,110
+Arbitrary labels,3,2461,119
+Arbitrary labels,3,2437,95
+Arbitrary labels,3,2432,90
+Arbitrary labels,3,2423,81
+Arbitrary labels,3,2408,66
+Arbitrary labels,3,2434,92
+Arbitrary labels,3,2405,63
+Arbitrary labels,3,2408,66
+Arbitrary labels,3,2445,103
+Arbitrary labels,3,2427,85
+Arbitrary labels,3,2450,108
+Arbitrary labels,3,2478,136
+Arbitrary labels,3,2412,70
+Arbitrary labels,3,2453,111
+Arbitrary labels,3,2425,83
+Arbitrary labels,3,2454,112
+Arbitrary labels,3,2434,92
+Arbitrary labels,3,2416,74
+Arbitrary labels,3,2441,99
+Arbitrary labels,3,2430,88
+Arbitrary labels,3,2437,95
+Arbitrary labels,3,2391,49
+Arbitrary labels,3,2395,53
+Arbitrary labels,3,2442,100
+Arbitrary labels,3,2396,54
+Arbitrary labels,3,2449,107
+Arbitrary labels,3,2420,78
+Arbitrary labels,3,2426,84
+Arbitrary labels,3,2456,114
+Arbitrary labels,3,2486,144
+Arbitrary labels,3,2446,104
+Arbitrary labels,3,2431,89
+Arbitrary labels,3,2463,121
+Arbitrary labels,3,2414,72
+Arbitrary labels,3,2427,85
+Arbitrary labels,3,2411,69
+Arbitrary labels,3,2459,117
+Arbitrary labels,3,2417,75
+Arbitrary labels,3,2425,83
+Arbitrary labels,3,2407,65
+Arbitrary labels,3,2423,81
+Arbitrary labels,3,2443,101
+Arbitrary labels,3,2461,119
+Arbitrary labels,3,2404,62
+Arbitrary labels,3,2434,92
+Arbitrary labels,3,2440,98
+Arbitrary labels,3,2454,112
+Arbitrary labels,3,2425,83
+Arbitrary labels,3,2409,67
+Arbitrary labels,3,2446,104
+Arbitrary labels,3,2432,90
+Arbitrary labels,3,2451,109
+Arbitrary labels,3,2426,84
+Arbitrary labels,3,2505,163
+Arbitrary labels,3,2462,120
+Arbitrary labels,3,2403,61
+Arbitrary labels,3,2450,108
+Arbitrary labels,3,2402,60
+Arbitrary labels,3,2413,71
+Arbitrary labels,3,2407,65
+Arbitrary labels,3,2433,91
+Arbitrary labels,3,2439,97
+Arbitrary labels,3,2408,66
+Arbitrary labels,3,2460,118
+Arbitrary labels,3,2441,99
+Arbitrary labels,3,2421,79
+Arbitrary labels,3,2457,115
+Arbitrary labels,3,2419,77
+Arbitrary labels,3,2401,59
+Arbitrary labels,3,2458,116
+Arbitrary labels,3,2417,75
+Arbitrary labels,3,2422,80
+Arbitrary labels,3,2450,108
+Arbitrary labels,3,2445,103
+Arbitrary labels,3,2429,87
+Arbitrary labels,3,2422,80
+Arbitrary labels,3,2410,68
+Arbitrary labels,3,2446,104
+Arbitrary labels,3,2472,130
+Arbitrary labels,3,2442,100
+Arbitrary labels,3,2438,96
+Arbitrary labels,3,2432,90
+Arbitrary labels,3,2450,108
+Arbitrary labels,3,2433,91
+Arbitrary labels,3,2426,84
+Arbitrary labels,3,2453,111
+Arbitrary labels,3,2442,100
+Arbitrary labels,3,2442,100
+Arbitrary labels,3,2438,96
+Arbitrary labels,3,2447,105
+Arbitrary labels,3,2411,69
+Arbitrary labels,3,2399,57
+Arbitrary labels,3,2451,109
+Arbitrary labels,3,2407,65
+Arbitrary labels,3,2471,129
+Arbitrary labels,3,2421,79
+Arbitrary labels,3,2415,73
+Arbitrary labels,3,2431,89
+Arbitrary labels,3,2421,79
+Arbitrary labels,3,2453,111
+Arbitrary labels,3,2410,68
+Arbitrary labels,3,2453,111
+Arbitrary labels,3,2413,71
+Arbitrary labels,3,2395,53
+Arbitrary labels,3,2414,72
+Arbitrary labels,3,2463,121
+Arbitrary labels,3,2438,96
+Arbitrary labels,3,2460,118
+Arbitrary labels,3,2429,87
+Arbitrary labels,3,2415,73
+Arbitrary labels,3,2452,110
+Arbitrary labels,3,2430,88
+Arbitrary labels,3,2427,85
+Arbitrary labels,3,2465,123
+Arbitrary labels,3,2400,58
+Arbitrary labels,3,2423,81
+Arbitrary labels,3,2416,74
+Arbitrary labels,3,2451,109
+Arbitrary labels,3,2422,80
+Arbitrary labels,3,2419,77
+Arbitrary labels,3,2444,102
+Arbitrary labels,3,2395,53
+Arbitrary labels,3,2425,83
+Arbitrary labels,3,2393,51
+Arbitrary labels,3,2452,110
+Arbitrary labels,3,2455,113
+Arbitrary labels,3,2421,79
+Arbitrary labels,3,2399,57
+Arbitrary labels,3,2443,101
+Arbitrary labels,3,2443,101
+Arbitrary labels,3,2416,74
+Arbitrary labels,3,2451,109
+Arbitrary labels,3,2484,142
+Arbitrary labels,3,2417,75
+Arbitrary labels,3,2487,145
+Arbitrary labels,3,2449,107
+Arbitrary labels,3,2415,73
+Arbitrary labels,3,2414,72
+Arbitrary labels,3,2407,65
+Arbitrary labels,3,2431,89
+Arbitrary labels,3,2410,68
+Arbitrary labels,3,2435,93
+Arbitrary labels,3,2429,87
+Arbitrary labels,3,2432,90
+Arbitrary labels,3,2459,117
+Arbitrary labels,3,2426,84
+Arbitrary labels,3,2456,114
+Arbitrary labels,3,2459,117
+Arbitrary labels,3,2405,63
+Arbitrary labels,3,2401,59
+Arbitrary labels,3,2451,109
+Arbitrary labels,3,2465,123
+Arbitrary labels,3,2439,97
+Arbitrary labels,3,2407,65
+Arbitrary labels,3,2434,92
+Arbitrary labels,3,2452,110
+Arbitrary labels,3,2447,105
+Arbitrary labels,3,2438,96
+Arbitrary labels,3,2484,142
+Arbitrary labels,3,2503,161
+Arbitrary labels,3,2408,66
+Arbitrary labels,3,2437,95
+Arbitrary labels,3,2438,96
+Arbitrary labels,3,2432,90
+Arbitrary labels,3,2452,110
+Arbitrary labels,3,2449,107
+Arbitrary labels,3,2437,95
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,878,64
+Math (digit sum mod 9),2,878,64
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,878,64
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,878,64
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,878,64
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,878,64
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,878,64
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,878,64
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,878,64
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,878,64
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,878,64
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,878,64
+Math (digit sum mod 9),2,878,64
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,878,64
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,878,64
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,878,64
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,878,64
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,878,64
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,878,64
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,878,64
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,878,64
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,878,64
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,878,64
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,878,64
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,878,64
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,877,63
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,878,64
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,878,64
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,877,63
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,878,64
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,878,64
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,878,64
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,878,64
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,878,64
+Math (digit sum mod 9),2,878,64
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,878,64
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,877,63
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,878,64
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,878,64
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,878,64
+Math (digit sum mod 9),2,878,64
+Math (digit sum mod 9),2,878,64
+Math (digit sum mod 9),2,878,64
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,878,64
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,878,64
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65
+Math (digit sum mod 9),2,879,65

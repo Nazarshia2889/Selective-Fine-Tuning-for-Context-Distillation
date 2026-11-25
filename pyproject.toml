@@ -18,6 +18,7 @@ dependencies = [
 [project.optional-dependencies]
 modal = ["modal>=1.0"]
 dev = ["pytest"]
+paper = ["matplotlib>=3.8"]
 
 [build-system]
 requires = ["setuptools>=64"]

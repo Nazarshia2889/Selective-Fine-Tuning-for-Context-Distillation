@@ -54,6 +54,10 @@ def train_sft(model, trainable: list[torch.nn.Parameter], examples: list[dict], 
         "train_time_s": time.time() - t0,
         "train_steps": step,
         "final_loss": sum(losses[-steps_per_epoch:]) / max(1, len(losses[-steps_per_epoch:])),
+        # mean loss per epoch and the per-step curve, to see whether training has converged
+        "epoch_losses": [sum(losses[e * steps_per_epoch:(e + 1) * steps_per_epoch]) / steps_per_epoch
+                         for e in range(cfg.epochs)],
+        "loss_curve": losses,
         "peak_mem_gb": torch.cuda.max_memory_allocated() / 2**30 if device.type == "cuda" else None,
     }
     del opt

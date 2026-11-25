@@ -1,6 +1,6 @@
 base_config: configs/base.yaml
 
-tasks: [label_mapping, knowledge, method_math]
+tasks: [arbitrary_labels, knowledge, math_methods]   # label_mapping (v1) replaced; see sfcd/tasks/arbitrary_labels.py
 granularities: [weight, row, block]
 budgets_blocks: [1, 2, 4]          # ~4%, 8%, 17% of eligible weights; weight/row budgets are param-matched
 selectors: [topk, random]
@@ -26,3 +26,40 @@ lr_tune:
     row: [1.0e-5, 3.0e-5, 1.0e-4]
     block: [1.0e-5, 3.0e-5, 1.0e-4]
     full: [1.0e-6, 3.0e-6, 1.0e-5]
+
+# ---------------------------------------------------------------- phase 1: sparsity curve
+# Individual weights (top-gradient) from 0.0001% to 17% of eligible weights. Each band of budgets has
+# its own 4-value lr grid (3x steps); smaller budgets get larger lrs, and neighbouring grids share 3
+# values. Bands were set from the pilot (knowledge: best lr >= 1e-3 at 0.01%, 1e-4 at 2%) and the
+# main sweep (1e-5 for weights at 8%). The lr is chosen per (task, budget) by mean val accuracy over
+# the task's contexts (stage select_by_val); MMLU forgetting is reported, not used for selection.
+# All phase-1 runs use the torch-2.9 environment (the main sweep's 4/8/17% runs are redone).
+sparsity:
+  # Lean ladder (10x steps). 0.03%, 0.3%, 2%, 8.3% and 16.7% can be added later where curves bend
+  # (same lr grids: 0.03% -> band of 0.01%, 0.3% -> 0.1%, 2% -> 1%, 2/4 blocks -> 1 block).
+  bands:
+    - {fractions: [0.000001, 0.00001], lrs: [1.0e-3, 3.0e-3, 1.0e-2, 3.0e-2]}   # 0.0001%, 0.001%
+    - {fractions: [0.0001],            lrs: [3.0e-4, 1.0e-3, 3.0e-3, 1.0e-2]}   # 0.01%
+    - {fractions: [0.001],             lrs: [1.0e-4, 3.0e-4, 1.0e-3, 3.0e-3]}   # 0.1%
+    - {fractions: [0.01],              lrs: [3.0e-5, 1.0e-4, 3.0e-4, 1.0e-3]}   # 1%
+    - {blocks: [1],                    lrs: [1.0e-5, 3.0e-5, 1.0e-4, 3.0e-4]}   # 4.2% (1 block)
+
+# Pilot (done 2026-11-23): context 0 of each task, smallest and largest fraction then planned, wide grid.
+# Its runs that fall inside the bands above are reused by phase 1.
+pilot:
+  context_id: 0
+  fractions: [0.0001, 0.02]
+  lrs: [3.0e-6, 1.0e-5, 3.0e-5, 1.0e-4, 3.0e-4, 1.0e-3]
+
+# Range check (2026-11-23): does math fail at the bottom of the ladder, and where does the new
+# arbitrary_labels task sit? Exact phase-1 runs, reused by phase 1.
+range_check:
+  - {task: method_math, context_id: 0, fractions: [0.000001, 0.00001]}   # v1 task, since replaced
+  - {task: arbitrary_labels, context_id: 0, fractions: [0.000001, 0.0001, 0.01]}
+
+# ---------------------------------------------------------------- phase 2: granularity at 4.2%
+# Rows and blocks at 1 block (4.2%), same lr grid as weights there; weights runs come from phase 1.
+granularity:
+  granularities: [row, block]
+  blocks: [1]
+  full_lrs: [3.0e-6]   # full fine-tuning reference for cost (and accuracy), 1 lr

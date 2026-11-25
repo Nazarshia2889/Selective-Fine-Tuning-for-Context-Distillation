@@ -53,9 +53,14 @@ class Mask:
         return torch.cat(parts)
 
 
-def budget_params(linears: list[LinearInfo], budget_blocks: int) -> int:
+def budget_params(linears: list[LinearInfo], budget_blocks: int | None = None,
+                  budget_frac: float | None = None) -> int:
+    """Number of weights to train: budget_blocks blocks' worth, or a fraction of all eligible weights."""
+    total = sum(li.numel for li in linears)
+    if budget_frac is not None:
+        return max(1, round(budget_frac * total))
     n_layers = len({li.layer for li in linears})
-    return round(budget_blocks * sum(li.numel for li in linears) / n_layers)
+    return round(budget_blocks * total / n_layers)
 
 
 def random_scores(linears: list[LinearInfo], seed: int) -> dict[str, torch.Tensor]:
@@ -76,8 +81,10 @@ def _split_sorted(idx: torch.Tensor, linears: list[LinearInfo], sizes: list[int]
 
 
 def select(scores: dict[str, torch.Tensor], linears: list[LinearInfo], granularity: str,
-           budget_blocks: int, device: str | torch.device = "cpu") -> Mask:
-    budget = budget_params(linears, budget_blocks)
+           budget_blocks: int | None, device: str | torch.device = "cpu", budget_frac: float | None = None) -> Mask:
+    if granularity == "block" and budget_frac is not None:
+        raise ValueError("block selection takes whole blocks; use budget_blocks")
+    budget = budget_params(linears, budget_blocks, budget_frac)
 
     if granularity == "weight":
         flat = torch.cat([scores[li.param_name].to(device).flatten() for li in linears])

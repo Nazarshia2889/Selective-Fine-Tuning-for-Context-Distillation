@@ -27,8 +27,10 @@ vol = modal.Volume.from_name(VOLUME_NAME, create_if_missing=True)
 image = (
     modal.Image.debian_slim(python_version="3.11")
     .uv_pip_install(
-        "torch==2.8.0", "transformers>=4.57", "accelerate", "datasets", "safetensors",
-        "pydantic>=2", "pyyaml", "pandas", "wandb",
+        # torch 2.9 + flash-linear-attention: fused kernels for Qwen3.5's linear-attention layers
+        # (~2.3x faster training than the PyTorch fallback; same math up to float rounding)
+        "torch==2.9.1", "transformers>=4.57", "accelerate", "datasets", "safetensors",
+        "pydantic>=2", "pyyaml", "pandas", "wandb", "flash-linear-attention", "einops",
     )
     .env({"HF_HOME": f"{ROOT}/hf", "TOKENIZERS_PARALLELISM": "false"})
     .add_local_python_source("sfcd")
@@ -92,6 +94,38 @@ def mmlu_base(base: dict) -> dict | None:
     return out
 
 
+@app.function(**{**gpu_kwargs, "timeout": 6 * 3600, "retries": 0})
+def prep_remote(base: dict, tasks: list[str]) -> dict:
+    """Whole prep for the given tasks in one container (data -> teacher -> filter -> score), so it
+    doesn't depend on the local client staying connected. Kept contexts of other tasks are untouched."""
+    import json
+
+    from sfcd import pipeline
+    from sfcd.model import load_model
+
+    paths = _setup()
+    b = _base(base)
+    pipeline.stage_build_data(paths, b, tasks)
+    vol.commit()
+    mt = load_model(b.model)
+    for t in tasks:
+        for c in pipeline.candidate_ids(t, b):
+            pipeline.stage_teacher(paths, b, t, c, mt)
+            vol.commit()
+    kept = pipeline.stage_filter(paths, b, tasks)
+    for t in tasks:
+        for c in kept[t]:
+            pipeline.stage_score(paths, b, t, c, mt)
+    vol.commit()
+    details = pipeline.read_json(paths.kept())["details"]
+    out = {"kept": {t: kept[t] for t in tasks},
+           "details": {k: v for k, v in details.items() if k.split("/")[0] in tasks}}
+    pipeline.write_json(paths.root / "diagnostics" / f"prep_{'_'.join(tasks)}.json", out)
+    vol.commit()
+    print(json.dumps(out, indent=1))
+    return out
+
+
 @app.function(**gpu_kwargs)
 def score(base: dict, task: str, cid: int):
     from sfcd import pipeline
@@ -134,7 +168,7 @@ def reeval(task: str, cid: int, stage: str = "main") -> dict:
 def progress() -> str:
     paths = _setup()
     lines = []
-    for stage in ("lr_tune", "main"):
+    for stage in ("lr_tune", "main", "sparsity", "granularity"):
         d = paths.results_dir(stage)
         lines.append(f"{stage}: {len(list(d.glob('*.json'))) if d.exists() else 0} finished")
     return "\n".join(lines)
@@ -180,6 +214,169 @@ def diagnose_forgetting(base: dict, task: str, cid: int) -> dict:
     return out
 
 
+@app.function(**gpu_kwargs)
+def env_check(base: dict, task: str, cid: int, write: bool = False) -> dict:
+    from sfcd import pipeline
+    from sfcd.paths import write_json
+
+    paths = _setup()
+    out = pipeline.stage_env_check(paths, _base(base), task, cid, write)
+    write_json(paths.root / "diagnostics" / f"env_check_{task}_c{cid}.json", out)
+    vol.commit()
+    return out
+
+
+@app.function(**gpu_kwargs)
+def mmlu_batch_check(base: dict) -> dict:
+    from sfcd import pipeline
+    from sfcd.paths import write_json
+
+    paths = _setup()
+    out = pipeline.mmlu_batching_check(paths, _base(base))
+    write_json(paths.root / "diagnostics" / "mmlu_batch_check.json", out)
+    vol.commit()
+    return out
+
+
+@app.function(volumes={ROOT: vol}, timeout=1800, memory=4096)
+def select_by_val() -> dict:
+    from sfcd import pipeline
+
+    out = pipeline.stage_select_by_val(_setup())
+    vol.commit()
+    return out
+
+
+@app.function(**{**gpu_kwargs, "timeout": 6 * 3600})
+def rescore_mmlu(task: str, cid: int) -> dict:
+    from sfcd import pipeline
+
+    out = pipeline.stage_rescore_mmlu(_setup(), task, cid)
+    vol.commit()
+    return out
+
+
+@app.function(**gpu_kwargs)
+def math_check(base: dict, cids: list[int]) -> dict:
+    from sfcd.analysis.math_check import check
+    from sfcd.paths import write_json
+
+    paths = _setup()
+    out = check(paths, _base(base), cids)
+    write_json(paths.root / "diagnostics" / "math_check.json", out)
+    vol.commit()
+    return out
+
+
+@app.function(**gpu_kwargs)
+def math_bench(base: dict, decodings: list[str] | None = None, per_level: int = 10) -> dict:
+    from sfcd.analysis.math_bench import run
+    from sfcd.paths import write_json
+
+    paths = _setup()
+    out = run(_base(base), per_level=per_level, decodings=decodings)
+    name = "math_bench_decoding.json" if decodings else "math_bench.json"
+    write_json(paths.root / "diagnostics" / name, out)
+    vol.commit()
+    return out
+
+
+@app.function(**{**gpu_kwargs, "timeout": 6 * 3600})
+def probe_math_methods(base: dict) -> list:
+    from sfcd.analysis.probe import probe
+    from sfcd.paths import write_json
+    from sfcd.tasks.math_methods import FAMILIES, MathMethodsTask
+
+    paths = _setup()
+    rows = probe(_base(base), {"math_methods": MathMethodsTask()}, list(range(len(FAMILIES))), 50)
+    write_json(paths.root / "diagnostics" / "probe_math_methods.json", rows)
+    vol.commit()
+    return rows
+
+
+@app.function(**{**gpu_kwargs, "timeout": 6 * 3600})
+def math_bench_students(run_ids: list[str]) -> dict:
+    from sfcd.analysis.math_bench import run_students
+    from sfcd.paths import write_json
+
+    paths = _setup()
+    out = run_students(paths, run_ids)
+    write_json(paths.root / "diagnostics" / "math_bench_students.json", out)
+    vol.commit()
+    return out
+
+
+@app.function(**gpu_kwargs)
+def math_bench_run(run_id: str, stage: str = "sparsity") -> dict:
+    """General-math check for one student (no base pass); result in diagnostics/math_bench/<run_id>.json."""
+    from sfcd.analysis.math_bench import run_students
+    from sfcd.paths import write_json
+
+    paths = _setup()
+    out = run_students(paths, [run_id], stage=stage, include_base=False)[run_id]
+    write_json(paths.root / "diagnostics" / "math_bench" / f"{run_id}.json", out)
+    vol.commit()
+    return {"run_id": run_id, "acc": out["overall"]["acc"]}
+
+
+@app.function(volumes={ROOT: vol}, timeout=3600, memory=16384)
+def delta_norms(stage: str = "sparsity", tasks: list[str] | None = None) -> list[dict]:
+    """Size of each saved weight change (no GPU): L2 norm, mean |change| per trained weight, max |change|."""
+    import torch
+    from safetensors.torch import load_file
+
+    from sfcd.paths import read_json, write_json
+
+    paths = _setup()
+    rows = []
+    base_params = None
+    for f in sorted(paths.results_dir(stage).glob("*.json")):
+        r = read_json(f)
+        c = r["config"]
+        if tasks and c["task"] not in tasks:
+            continue
+        dp = paths.delta(stage, r["run_id"])
+        if not dp.exists():
+            continue
+        d = load_file(str(dp))
+        if c["granularity"] in ("block", "full"):  # saved as the new weights, not the change: subtract the base
+            if base_params is None:
+                from sfcd.config import BaseCfg
+                from sfcd.model import load_model
+
+                m, _ = load_model(BaseCfg.model_validate(c["base"]).model, torch.device("cpu"))
+                base_params = {n: p.detach() for n, p in m.named_parameters()}
+            vals = [v.float() - base_params[k].float() for k, v in d.items()]
+        else:
+            vals = [v.float() for k, v in d.items() if k.endswith(".delta")] or [v.float() for v in d.values()]
+        sq = sum(float((v ** 2).sum()) for v in vals)
+        n = sum(v.numel() for v in vals)
+        rows.append({"run_id": r["run_id"], "task": c["task"], "context_id": c["context_id"], "lr": c["lr"],
+                     "frac": r.get("frac_eligible_trained"), "n_trained": n, "l2": sq ** 0.5,
+                     "mean_abs": sum(float(v.abs().sum()) for v in vals) / max(1, n),
+                     "max_abs": max(float(v.abs().max()) for v in vals),
+                     "student_test": r.get("student_test"), "recovery_test": r.get("recovery_test"),
+                     "mmlu_forgetting": r.get("mmlu_forgetting")})
+    write_json(paths.root / "diagnostics" / f"delta_norms_{stage}.json", rows)
+    vol.commit()
+    return rows
+
+
+MMLU_CHECK_RUNS = "716e98e20a41,eea5f8070579,91586ed005d6,a5aa948c7ab7,7cb41a89f935,8d7dd188f60f"
+
+
+@app.function(**gpu_kwargs)
+def mmlu_check(run_ids: list[str], stage: str = "main") -> dict:
+    from sfcd.analysis.mmlu_check import check
+    from sfcd.paths import write_json
+
+    paths = _setup()
+    out = check(paths, run_ids, stage)
+    write_json(paths.root / "diagnostics" / "mmlu_check.json", out)
+    vol.commit()
+    return out
+
+
 PROBE_SPECS = [  # label, task, constructor kwargs
     ("base7_small_8shots", "base_arith", {"variant": "small", "n_shots": 8}),
     ("base7_small_16shots", "base_arith", {"variant": "small", "n_shots": 16}),
@@ -214,7 +411,8 @@ def _report(results):
 
 @app.local_entrypoint()
 def main(stage: str = "prep", sweep: str = "configs/sweep.yaml", overrides: str = "",
-         dry_run: bool = False, limit: int = 0, force: bool = False, tasks: str = "", spawn: bool = False):
+         dry_run: bool = False, limit: int = 0, force: bool = False, tasks: str = "", spawn: bool = False,
+         run_ids: str = MMLU_CHECK_RUNS):
     # Only sfcd.config is imported locally (needs pydantic + pyyaml, not torch).
     from sfcd.config import expand_stage, load_base, load_sweep
 
@@ -225,7 +423,7 @@ def main(stage: str = "prep", sweep: str = "configs/sweep.yaml", overrides: str 
     bd = base.model_dump()
     cands = [(t, c) for t in sw.tasks for c in range(base.data.n_candidates)]
 
-    if stage in ("lr_tune", "main"):
+    if stage in ("lr_tune", "main", "pilot", "sparsity", "range_check", "granularity"):
         state = {} if dry_run else read_state.remote()
         runs = expand_stage(stage, sw, base, state)
         if limit:
@@ -249,6 +447,9 @@ def main(stage: str = "prep", sweep: str = "configs/sweep.yaml", overrides: str 
         print(f"stage {stage}; candidates: {cands}")
         return
 
+    if stage == "prep_spawn":  # server-side prep; result in diagnostics/prep_<tasks>.json
+        print("spawned prep:", prep_remote.spawn(bd, sw.tasks).object_id)
+        return
     if stage in ("data", "prep"):
         build_data.remote(bd, sw.tasks)
     if stage in ("teacher", "prep"):
@@ -269,8 +470,56 @@ def main(stage: str = "prep", sweep: str = "configs/sweep.yaml", overrides: str 
             print(f"submitted {len(jobs)} re-eval jobs")
             return
         _report(list(reeval.starmap(jobs, return_exceptions=True)))
+    if stage == "rescore_mmlu":
+        kept = read_state.remote()["kept"] or {}
+        jobs = [(t, c) for t, cs in kept.items() for c in cs]
+        if spawn:
+            rescore_mmlu.spawn_map([j[0] for j in jobs], [j[1] for j in jobs])
+            print(f"submitted {len(jobs)} MMLU rescoring jobs")
+            return
+        _report(list(rescore_mmlu.starmap(jobs, return_exceptions=True)))
     if stage == "progress":
         print(progress.remote())
+    if stage == "env_check":  # spawned; results in diagnostics/ on the volume
+        kept = read_state.remote()["kept"] or {}
+        jobs = [(t, c) for t, cs in kept.items() for c in cs]
+        env_check.spawn_map([bd] * len(jobs), [j[0] for j in jobs], [j[1] for j in jobs])
+        print("spawned env checks:", jobs, "and mmlu batching check", mmlu_batch_check.spawn(bd).object_id)
+        return
+    if stage == "rebaseline":  # recompute baselines in the current environment for the given tasks
+        kept = read_state.remote()["kept"] or {}
+        jobs = [(t, c) for t in sw.tasks for c in kept.get(t, [])]
+        env_check.spawn_map([bd] * len(jobs), [j[0] for j in jobs], [j[1] for j in jobs], [True] * len(jobs))
+        print("spawned rebaseline:", jobs)
+        return
+    if stage == "math_bench":  # spawned; result in diagnostics/math_bench.json
+        print("spawned MATH benchmark:", math_bench.spawn(bd).object_id)
+        return
+    if stage == "decoding_check":  # spawned; result in diagnostics/math_bench_decoding.json
+        names = ["greedy", "qwen_recommended", "qwen_benchmark", "greedy_presence"]
+        print("spawned decoding check:", math_bench.spawn(bd, names, 5).object_id)
+        return
+    if stage == "delta_norms":  # spawned; result in diagnostics/delta_norms_sparsity.json
+        print("spawned:", delta_norms.spawn("sparsity").object_id)
+        return
+    if stage == "delta_norms_granularity":  # spawned; result in diagnostics/delta_norms_granularity.json
+        print("spawned:", delta_norms.spawn("granularity").object_id)
+        return
+    if stage in ("math_bench_each", "math_bench_each_granularity"):  # spawned, one container per student
+        ids = [r.strip() for r in run_ids.split(",") if r.strip()]
+        run_stage = "granularity" if stage.endswith("granularity") else "sparsity"
+        math_bench_run.spawn_map(ids, kwargs={"stage": run_stage})
+        print(f"spawned {len(ids)} MATH checks")
+        return
+    if stage == "math_bench_students":  # spawned; --run-ids = students; result in diagnostics/
+        ids = [r.strip() for r in run_ids.split(",") if r.strip()]
+        print("spawned:", math_bench_students.spawn(ids).object_id)
+        return
+    if stage == "math_check":  # spawned; result in diagnostics/math_check.json
+        print("spawned math check:", math_check.spawn(bd, [0, 1, 2]).object_id)
+        return
+    if stage == "select_by_val":
+        print("chosen lrs:", select_by_val.remote())
     if stage == "select_lr":
         print("best lr:", select_lr.remote(sw.lr_tune.max_mmlu_drop))
     if stage == "aggregate":
@@ -286,6 +535,17 @@ def main(stage: str = "prep", sweep: str = "configs/sweep.yaml", overrides: str 
         Path("results").mkdir(exist_ok=True)
         Path(f"results/forgetting_{sw.tasks[0]}.json").write_text(json.dumps(out, indent=2))
         print(json.dumps(out, indent=2))
+    if stage == "mmlu_check":
+        import json
+
+        ids = [r.strip() for r in run_ids.split(",") if r.strip()]
+        if spawn:  # result lands on the volume at diagnostics/mmlu_check.json
+            print("spawned", mmlu_check.spawn(ids).object_id)
+            return
+        out = mmlu_check.remote(ids)
+        Path("results").mkdir(exist_ok=True)
+        Path("results/mmlu_check.json").write_text(json.dumps(out, indent=2))
+        print("wrote results/mmlu_check.json")
     if stage == "probe":
         import json
 
@@ -294,6 +554,9 @@ def main(stage: str = "prep", sweep: str = "configs/sweep.yaml", overrides: str 
         Path("results/probe.json").write_text(json.dumps(rows, indent=2))
         for r in rows:
             print(f"{r['variant']:20s} c{r['context_id']}  with context={r['icl']:.2f}  without={r['zero_shot']:.2f}  gap={r['gap']:+.2f}")
+    if stage == "probe_math_methods":  # spawned; result in diagnostics/probe_math_methods.json
+        print("spawned:", probe_math_methods.spawn(bd).object_id)
+        return
     if stage == "probe_method":
         import json
 

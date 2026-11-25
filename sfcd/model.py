@@ -37,13 +37,20 @@ def load_model(cfg: ModelCfg, device: torch.device | None = None):
     """Load in fp32 master weights (compute happens under autocast)."""
     from transformers import AutoModelForCausalLM
 
+    import os
+
     device = device or get_device()
+    # SFCD_USE_KERNELS=1: prebuilt fused kernels from the HF kernels hub (speed only; same math up to
+    # float rounding). An env var rather than a config field so run ids don't change.
+    kw = {"use_kernels": True} if os.environ.get("SFCD_USE_KERNELS") == "1" and device.type == "cuda" else {}
+    if kw:
+        kw["device_map"] = str(device)
     try:
-        model = AutoModelForCausalLM.from_pretrained(cfg.name, torch_dtype=torch.float32)
+        model = AutoModelForCausalLM.from_pretrained(cfg.name, torch_dtype=torch.float32, **kw)
     except ValueError:  # multimodal checkpoints (e.g. *ForConditionalGeneration)
         from transformers import AutoModelForImageTextToText
 
-        model = AutoModelForImageTextToText.from_pretrained(cfg.name, torch_dtype=torch.float32)
+        model = AutoModelForImageTextToText.from_pretrained(cfg.name, torch_dtype=torch.float32, **kw)
     model.to(device)
     model.config.use_cache = False
     return model, load_tokenizer(cfg.name)
@@ -129,9 +136,27 @@ def stop_token_ids(model, tok) -> list[int]:
     return ids
 
 
+class PresencePenalty:
+    """OpenAI/vLLM-style presence penalty: subtract `penalty` from the logit of every token that already
+    appears in the generated part (not the prompt). Hugging Face generate() has no built-in for it."""
+
+    def __init__(self, penalty: float, prompt_len: int):
+        self.penalty, self.prompt_len = penalty, prompt_len
+
+    def __call__(self, input_ids: torch.Tensor, scores: torch.Tensor) -> torch.Tensor:
+        gen = input_ids[:, self.prompt_len:]
+        if gen.shape[1] == 0:
+            return scores
+        seen = torch.zeros_like(scores, dtype=torch.bool).scatter_(1, gen, True)
+        return scores - self.penalty * seen.to(scores.dtype)
+
+
+@torch.no_grad()
 def generate(model, tok, prompts: list[str], max_new_tokens: int, batch_size: int,
-             model_cfg: ModelCfg) -> list[str]:
-    """Greedy batched generation; returns only the new text. Prompts are length-sorted for efficiency."""
+             model_cfg: ModelCfg, sampling: dict | None = None, seed: int = 0) -> list[str]:
+    """Batched generation; returns only the new text. Prompts are length-sorted for efficiency.
+    sampling=None is greedy. Otherwise a dict with any of temperature, top_p, top_k, presence_penalty
+    (temperature 0 or missing means greedy, still with the presence penalty if given)."""
     device = next(model.parameters()).device
     was_training = model.training
     model.eval()
@@ -142,9 +167,20 @@ def generate(model, tok, prompts: list[str], max_new_tokens: int, batch_size: in
     for s in range(0, len(order), batch_size):
         idx = order[s:s + batch_size]
         enc = tok([prompts[i] for i in idx], return_tensors="pt", padding=True, add_special_tokens=False).to(device)
+        kw: dict = {"do_sample": False}
+        if sampling:
+            from transformers import LogitsProcessorList
+
+            if sampling.get("presence_penalty"):
+                kw["logits_processor"] = LogitsProcessorList(
+                    [PresencePenalty(sampling["presence_penalty"], enc["input_ids"].shape[1])])
+            if sampling.get("temperature"):
+                kw.update(do_sample=True, temperature=sampling["temperature"],
+                          top_p=sampling.get("top_p", 1.0), top_k=sampling.get("top_k", 0))
+                torch.manual_seed(seed + s)
         with autocast(model_cfg, device):
-            gen = model.generate(**enc, max_new_tokens=max_new_tokens, do_sample=False,
-                                 pad_token_id=tok.pad_token_id, eos_token_id=stops, use_cache=True)
+            gen = model.generate(**enc, max_new_tokens=max_new_tokens,
+                                 pad_token_id=tok.pad_token_id, eos_token_id=stops, use_cache=True, **kw)
         texts = tok.batch_decode(gen[:, enc["input_ids"].shape[1]:], skip_special_tokens=True)
         for i, t in zip(idx, texts):
             outs[i] = t.strip()

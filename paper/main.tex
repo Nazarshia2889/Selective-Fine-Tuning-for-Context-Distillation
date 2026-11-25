@@ -1,0 +1,355 @@
+\documentclass{article} % For LaTeX2e
+\usepackage{nips15submit_e,times}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage[section]{placeins} % keep each figure/table inside its own section
+
+% TODO markers (remove \todo{...} before submitting; \renewcommand{\todo}[1]{} hides them all)
+\newcommand{\todo}[1]{{\color{red}[TODO: #1]}}
+\newcommand{\inprogress}{{\color{orange}\textbf{[IN PROGRESS]}}}
+
+\title{\todo{Title}: Selective Fine-Tuning for Context Distillation}
+
+\author{
+\todo{Author 1} \\
+\todo{Affiliation} \\
+\texttt{\todo{email}} \\
+\And
+\todo{Author 2} \\
+\todo{Affiliation} \\
+\texttt{\todo{email}} \\
+\AND
+\todo{Author 3} \\
+\todo{Affiliation} \\
+\texttt{\todo{email}} \\
+\And
+\todo{Author 4} \\
+\todo{Affiliation} \\
+\texttt{\todo{email}} \\
+}
+
+\newcommand{\fix}{\marginpar{FIX}}
+\newcommand{\new}{\marginpar{NEW}}
+
+\nipsfinalcopy % show author names (class report, not anonymous)
+
+\begin{document}
+
+\maketitle
+
+% =====================================================================================================
+\begin{abstract}
+\todo{4--6 sentences: problem (contexts cost compute at every query; distill them into weights); what we
+do (fine-tune only the top-gradient share of weights, from 0.0001\% to 4.2\%, on three task types); main
+findings (tiny shares recover in-context performance; forgetting follows the size of the update, so the
+learning rate decides it; large savings in storage, memory and time; structured selection); one line
+on implication.}
+\end{abstract}
+
+% =====================================================================================================
+\section{Introduction}
+\label{sec:intro}
+\todo{Motivation: in-context learning works without training but the context is re-read at every query.
+Context distillation moves that behaviour into the weights. Question: how few weights are needed, and what
+does it cost the model's general abilities?}
+
+\todo{Contributions, as a list:
+(1) a sparsity sweep over six orders of magnitude on three task types;
+(2) evidence that forgetting tracks update size, and a learning-rate rule that limits it;
+(3) cost measurements against full fine-tuning;
+(4) a comparison of individual weights, rows and blocks at a fixed budget.}
+
+\begin{figure}[t]
+  \centering
+  \fbox{\parbox[c][1.4in][c]{0.9\linewidth}{\centering \todo{F1: method schematic (TikZ or drawn).
+  Teacher = model + context $\to$ answers on training queries.
+  Student = same model, no context; score gradients, keep the top share of weights, train only those on the
+  teacher's answers. Evaluate on test queries without the context, plus MMLU / MATH for forgetting.}}}
+  \caption{\todo{Overview of selective context distillation.}}
+  \label{fig:overview}
+\end{figure}
+
+% =====================================================================================================
+\section{Background and related work}
+\label{sec:related}
+\todo{2--3 pages in total. Each subsection: what is known, closest papers in detail, how we differ.}
+
+\subsection{In-context learning}
+\todo{ICL \citep{brown2020language}; what demonstrations contribute \citep{min2022rethinking};
+learning arbitrary (semantically unrelated) label mappings from context \citep{wei2023larger} --- our
+Label Mapping task follows this.}
+
+\subsection{Context distillation}
+\todo{\citet{askell2021general} distill a prompt into weights; \citet{snell2022learning} distill
+instructions, scratchpads and examples. We ask how many weights this needs.}
+
+\subsection{Parameter-efficient and sparse fine-tuning}
+\todo{Adapters \citep{houlsby2019parameter}, LoRA \citep{hu2022lora}, BitFit \citep{zaken2022bitfit};
+sparse updates: diff pruning \citep{guo2021diffpruning}, Fisher-based fixed masks \citep{sung2021fish},
+lottery-ticket sparse fine-tuning \citep{ansell2022composable}, scaling sparse fine-tuning to LLMs
+\citep{ansell2024spiel}; skill localization with few parameters \citep{panigrahi2023skill}.
+Our selection: top gradient magnitude, at weight / row / block granularity.}
+
+\subsection{Forgetting during fine-tuning}
+\todo{Catastrophic forgetting \citep{mccloskey1989catastrophic,kirkpatrick2017ewc};
+in LLM fine-tuning \citep{luo2023forgetting}; ``LoRA learns less and forgets less''
+\citep{biderman2024lora} --- closest to our finding that update size, not parameter count, drives forgetting.}
+
+\subsection{Where knowledge lives in transformers}
+\todo{Knowledge neurons \citep{dai2022knowledge}, ROME \citep{meng2022rome}: facts localize in MLP
+weights --- relevant to why knowledge needs more weights than the method task.}
+
+\subsection{How this work differs}
+\todo{One paragraph: same model, same data, change one factor at a time (share, then granularity);
+forgetting measured on both knowledge (MMLU) and reasoning (MATH).}
+
+% =====================================================================================================
+\section{Methods}
+\label{sec:methods}
+
+\subsection{Setup and notation}
+\todo{Model $f_\theta$ (Qwen3.5-0.8B, non-thinking mode). Context $c$, query $x$. Teacher answer
+$y \sim f_\theta(\cdot \mid c, x)$ (greedy). Student trains $\theta$ on $(x, y)$ without $c$.}
+\begin{equation}
+  \mathcal{L}(\theta) = -\frac{1}{\sum_i |y_i|}\sum_{i}\sum_{t=1}^{|y_i|} \log f_\theta\big(y_{i,t} \mid x_i, y_{i,<t}\big)
+  \label{eq:sft}
+\end{equation}
+\todo{Only answer tokens are in the loss.}
+
+\subsection{Tasks}
+\todo{Describe the three tasks (one paragraph each): Knowledge Retrieval (facts about fictional
+people), Label Mapping (AG News / DBpedia topics mapped to unrelated words; \citealp{zhang2015character}),
+Mathematical Reasoning (remainder mod 9 via the digit-sum method; one context of 8 worked solutions).
+Why a single math context: most other problem types gained little from a context (Appendix~\ref{app:tasks}). Context filter: kept if the context
+raises validation accuracy by $\ge 20$ points.}
+\begin{table}[t]
+  \centering\small
+  \input{tables/t1_tasks}
+  \caption{\todo{Tasks. Test accuracy of the untrained model without and with the context (the
+  teacher), averaged over a task's contexts.}}
+  \label{tab:tasks}
+\end{table}
+
+\subsection{Selecting weights}
+\todo{Eligible weights: all linear-layer weights in the transformer blocks, $N = 497.6$M (embeddings,
+norms, LM head excluded). Score each weight by its mean absolute gradient of Eq.~\ref{eq:sft} over
+$B = 8$ training batches (as in sfcd/selection/scoring.py):}
+\begin{equation}
+  s_j = \frac{1}{B}\sum_{b=1}^{B} \big| \nabla_{\theta_j} \mathcal{L}_b(\theta) \big|
+  \label{eq:score}
+\end{equation}
+\todo{Budget = share $\rho$ of $N$. Weights: keep the top $\rho N$ scores. Rows: rank output rows by the
+mean score of their weights and add rows until $\rho N$ weights are reached. Blocks: rank transformer
+blocks by mean score and keep whole blocks (one block $= 4.2\%$). Granularities are matched in parameter
+count at $\rho = 4.2\%$.}
+
+\subsection{Training}
+\todo{AdamW \citep{loshchilov2019adamw}, 3 epochs, batch 16, mask applied to gradients so untrained
+weights never move; bf16 autocast, fp32 master weights.}
+
+\subsection{Evaluation}
+\todo{Task accuracy without the context on held-out test queries. Recovery:}
+\begin{equation}
+  R = \frac{a_{\text{student}} - a_{\text{floor}}}{a_{\text{teacher}} - a_{\text{floor}}},
+  \qquad a_{\text{floor}} = \max(a_{\text{no context}},\, a_{\text{majority label}})
+  \label{eq:recovery}
+\end{equation}
+\todo{MMLU \citep{hendrycks2021mmlu}: 500 questions, scored by option text (Eq.~\ref{eq:mmlu}), not the
+letter --- why: Appendix~\ref{app:mmlu}. MATH \citep{hendrycks2021math}: 175 problems, greedy, exact
+numeric answers. Change size $\|\Delta\theta\|_2$.}
+\begin{equation}
+  \hat{k} = \arg\max_{k} \frac{1}{|o_k|}\sum_{t=1}^{|o_k|} \log f_\theta\big(o_{k,t} \mid q, o_{k,<t}\big)
+  \label{eq:mmlu}
+\end{equation}
+
+\subsection{Choosing the learning rate}
+\todo{Four learning rates per share, shifted toward larger values for smaller shares (Table~\ref{tab:hparams}).
+Pick the smallest learning rate whose mean validation accuracy reaches}
+\begin{equation}
+  \tau = \min\Big(\hat p - \sqrt{\hat p (1-\hat p)/n},\;\; a^{\text{val}}_{\text{teacher}}\Big)
+  \label{eq:lrrule}
+\end{equation}
+\todo{One-standard-error rule \citep{hastie2009elements}, capped at the teacher. Only validation
+accuracy is used. Motivated by Section~\ref{sec:res-lr}.}
+
+\subsection{Hyperparameters}
+\begin{table}[t]
+  \centering\small
+  \begin{tabular}{lll}
+    \toprule
+    Hyperparameter & Value & Source / reason \\
+    \midrule
+    Model & Qwen3.5-0.8B (non-thinking) & \todo{why this model} \\
+    Optimizer & AdamW, weight decay 0 & \citet{loshchilov2019adamw} \\
+    Epochs / batch size & 3 / 16 & \todo{reason} \\
+    Training examples per context & 500 & \todo{} \\
+    Learning rates (0.0001\%, 0.001\%) & 1e-3, 3e-3, 1e-2, 3e-2 & pilot; Appendix~\ref{app:hparams} \\
+    Learning rates (0.01\%) & 3e-4, 1e-3, 3e-3, 1e-2 & \\
+    Learning rates (0.1\%) & 1e-4, 3e-4, 1e-3, 3e-3 & \\
+    Learning rates (1\%) & 3e-5, 1e-4, 3e-4, 1e-3 & \\
+    Learning rates (4.2\%, all granularities) & 1e-5, 3e-5, 1e-4, 3e-4 & \\
+    Full fine-tuning learning rate & 3e-6 & earlier sweep \\
+    Decoding & greedy, $\le$1536 tokens (math) & Appendix~\ref{app:math} \\
+    \bottomrule
+  \end{tabular}
+  \caption{\todo{Hyperparameters and how they were chosen.}}
+  \label{tab:hparams}
+\end{table}
+
+\subsection{Controls}
+\todo{What changes one at a time: (1) share of weights with granularity fixed (weights); (2) granularity
+at a fixed budget (4.2\%) and the same learning-rate grid. Same data, contexts, steps and evaluation
+everywhere. Not controlled: one random seed per setting; one model size; math has one context.}
+
+% =====================================================================================================
+\section{Results}
+\label{sec:results}
+
+\subsection{The learning rate decides how much the model forgets}
+\label{sec:res-lr}
+\todo{Smaller learning rate $\to$ smaller change (all 43 task/context/share groups); larger change $\to$
+lower MMLU (rank correlation 0.66--0.87 per task). Change size does not predict task accuracy: the share
+sets the ceiling. Hence the rule in Eq.~\ref{eq:lrrule}.}
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{figures/f2_lr_change_forgetting.pdf}
+  \caption{\todo{(a) Change size vs learning rate, one line per share; mean over tasks and contexts;
+  log--log because both span orders of magnitude. (b) MMLU vs change size, every phase-1 run.}}
+  \label{fig:lr}
+\end{figure}
+
+\subsection{In-context performance is recovered with a tiny share of weights}
+\todo{Knowledge Retrieval and Label Mapping reach the teacher at about 0.1\%; Mathematical Reasoning
+at 0.0001\% (498 weights), where it already beats the teacher.}
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{figures/f3_accuracy_by_share.pdf}
+  \caption{\todo{Test accuracy without the context at the picked learning rate. Points: mean over a task's
+  contexts; bars: lowest and highest context (3 contexts, so a range is more informative than a standard
+  deviation; math has one context). Shares evenly spaced, not to scale.}}
+  \label{fig:acc}
+\end{figure}
+
+\subsection{Forgetting stays small at the picked learning rates}
+\todo{MMLU stays near the untrained model; MATH for Mathematical Reasoning students drops $\sim$6--8 points at picked
+rates but collapses at larger rates (Appendix~\ref{app:everylr}); MMLU alone misses this.}
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{figures/f4_forgetting_by_share.pdf}
+  \caption{\todo{MMLU of each task's students and MATH of the Mathematical Reasoning students, at
+  the picked learning rate. Bars: lowest and highest context.}}
+  \label{fig:forget}
+\end{figure}
+
+\subsection{Savings in storage, memory and training time}
+\todo{At inference the student reads 14--25$\times$ fewer input tokens per query; training memory is
+about half of full fine-tuning; training time pending a controlled benchmark; full fine-tuning on Mathematical Reasoning ran out of memory on the 40 GB GPU. Memory and time barely change with the share.}
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{figures/f5_efficiency.pdf}
+  \caption{\todo{Left: peak GPU memory while training (dashed: 40 GB GPU; cross: ran out of memory).
+  Middle: training time [IN PROGRESS: controlled benchmark]. Right: input tokens per test query with the
+  context (teacher) and without it (student); the ratio is the factor of prompt compute saved at every query.
+  Squares: full fine-tuning.}}
+  \label{fig:cost}
+\end{figure}
+\begin{table}[t]
+  \centering\small
+  \input{tables/t3_efficiency}
+  \caption{\todo{Cost at the 4.2\% budget by granularity, and full fine-tuning.}}
+  \label{tab:cost}
+\end{table}
+
+\subsection{Structured fine-tuning: weights, rows and blocks}
+\todo{At 4.2\%: rows match weights; blocks need larger learning rates to learn Knowledge Retrieval and
+Label Mapping and then forget more (MMLU near chance). At equal learning rate the change size is the same for
+all three. Blocks keep the most general math.}
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{figures/f6_granularity.pdf}
+  \caption{\todo{Weights, rows and blocks at 4.2\% (one block), each at its own picked learning rate.}}
+  \label{fig:gran}
+\end{figure}
+
+\subsection{Top-gradient versus random selection}
+\inprogress\ \todo{Same shares and learning-rate grid with a random mask.}
+
+% =====================================================================================================
+\section{Discussion and limitations}
+\label{sec:discussion}
+\todo{What we learn. Limitations: one 0.8B model; one seed per setting; math has a single context; MMLU
+is only $\sim$6 points above chance with option-text scoring; timing measured on shared cloud GPUs;
+learning-rate windows shift with the share, so not every share sees the same rates.}
+
+\section{Conclusion}
+\label{sec:conclusion}
+\todo{Two or three sentences.}
+
+% =====================================================================================================
+\small
+\bibliographystyle{abbrvnat}
+\bibliography{refs}
+
+% =====================================================================================================
+\clearpage
+\appendix
+\normalsize
+
+\section{Task details and prompts}
+\label{app:tasks}
+\todo{Example context and query per task; the probe of ten math problem types and why only the
+digit-sum (mod 9) type was kept for Mathematical Reasoning.}
+
+\section{Every learning rate, per context}
+\label{app:everylr}
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\linewidth]{figures/f7_every_lr_knowledge.pdf}
+  \includegraphics[width=\linewidth]{figures/f7_every_lr_arbitrary.pdf}
+  \caption{\todo{Box plots over the learning rates tried at each share (box: middle half, line: median,
+  whiskers: range); gray dots are individual learning rates, colored dot the picked one.}}
+  \label{fig:box}
+\end{figure}
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.5\linewidth]{figures/f7_every_lr_math.pdf}
+  \caption{\todo{Same for Mathematical Reasoning, including MATH.}}
+\end{figure}
+\begin{table}[h]
+  \centering\small
+  \input{tables/t_picked_runs}
+  \caption{\todo{Picked runs.}}
+\end{table}
+
+\section{Training curves}
+\label{app:curves}
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\linewidth]{figures/f8_training_loss.pdf}
+  \caption{\todo{Training loss of the picked runs, mean over contexts.}}
+\end{figure}
+
+\section{MATH protocol and decoding}
+\label{app:math}
+\todo{Subset (5 per subject and level, numeric answers), greedy vs Qwen's recommended sampling check, token limit.}
+
+\section{Why MMLU is scored by option text}
+\label{app:mmlu}
+\todo{Letter scoring counted format takeover (students answering with label words) as forgetting.}
+
+\section{Learning-rate grids and pilot}
+\label{app:hparams}
+\todo{Pilot runs, grid-edge checks, range check on knowledge.}
+
+\section{Compute}
+\todo{A100-40GB on Modal; number of runs; approximate cost.}
+
+\section{Reproducing the results}
+\todo{Repository URL; \texttt{python scripts/export\_results.py}; \texttt{python scripts/make\_figures.py}.}
+
+\end{document}
