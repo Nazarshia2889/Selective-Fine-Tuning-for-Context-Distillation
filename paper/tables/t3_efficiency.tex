@@ -1,0 +1,17 @@
+\begin{tabular}{llrrr}
+\toprule
+Task & Method & Trained (M) & Memory (GB) & Time (s) \\
+\midrule
+Knowledge Retrieval & Weights, 4.2\% & 20.7 & 6.2 & 61 \\
+Knowledge Retrieval & Full, linear layers & 497.6 & 11.3 & 56 \\
+Knowledge Retrieval & Full, all weights & 752.4 & 14.4 & 61 \\
+\midrule
+Label Mapping & Weights, 4.2\% & 20.7 & 8.8 & 65 \\
+Label Mapping & Full, linear layers & 497.6 & 13.8 & 59 \\
+Label Mapping & Full, all weights & 752.4 & 16.9 & 65 \\
+\midrule
+Mathematical Reasoning & Weights, 4.2\% & 20.7 & 26.6 & 77 \\
+Mathematical Reasoning & Full, linear layers & 497.6 & \multicolumn{2}{c}{out of memory (40 GB)} \\
+Mathematical Reasoning & Full, all weights & 752.4 & \multicolumn{2}{c}{out of memory (40 GB)} \\
+\bottomrule
+\end{tabular}

@@ -6,3 +6,19 @@ results/
 wandb/
 .pytest_cache/
 *.egg-info/
+
+# paper tables are small and committed so figures can be rebuilt without Modal
+!results/
+results/*
+!results/paper/
+.DS_Store
+paper.zip
+paper/*.aux
+paper/*.log
+paper/*.out
+paper/*.bbl
+paper/*.blg
+paper/*.fls
+paper/*.fdb_latexmk
+paper/*.synctex.gz
+paper/main.pdf

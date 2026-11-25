@@ -253,3 +253,153 @@ def test_saved_delta_roundtrip(tiny, gran):
     apply_saved_delta(fresh, gran, delta)
     for (n, a), (_, b) in zip(model.state_dict().items(), fresh.state_dict().items()):
         torch.testing.assert_close(a, b, atol=1e-6, rtol=1e-5, msg=n)
+
+
+class _CharTok:
+    """Minimal offline tokenizer: one token per character (ids mod 128)."""
+    chat_template = None
+
+    def __call__(self, text, add_special_tokens=False):
+        return {"input_ids": [ord(ch) % 128 for ch in text]}
+
+
+def test_option_text_scores_match_manual(tiny):
+    from sfcd.evaluate import option_text_scores, _ClozeTask
+    from sfcd.model import build_prompt
+
+    tok = _CharTok()
+    items = [{"question": "2+2?", "choices": ["four", "five", "a long answer", "six"], "answer": 0}]
+    cfg = ModelCfg(compute_dtype="float32")
+    got = option_text_scores(tiny, tok, items, cfg, batch_seqs=3)[0]
+    p = tok(build_prompt(tok, _ClozeTask(), None, "2+2?\n\nAnswer:"))["input_ids"]
+    for c, g in zip(items[0]["choices"], got):
+        o = tok(" " + c)["input_ids"]
+        x = torch.tensor([p + o])
+        with torch.no_grad():
+            lp = tiny(x).logits[0, :-1].log_softmax(-1).gather(-1, x[0, 1:, None])[:, 0]
+        assert abs(float(lp[len(p) - 1:].mean()) - g) < 1e-5
+
+
+def test_old_run_id_unchanged():
+    import json
+    from sfcd.config import RunCfg
+
+    r = json.load(open("tests/fixtures/old_run.json"))
+    assert RunCfg.model_validate(r["config"]).run_id() == r["run_id"]
+
+
+def test_phase_stage_counts():
+    from sfcd.config import expand_pilot, expand_sparsity
+
+    sw = load_sweep("configs/sweep.yaml")
+    base = load_base(sw.base_config)
+    kept = {"arbitrary_labels": [0, 2, 3], "knowledge": [0, 1, 2], "math_methods": [2]}
+    sp = expand_sparsity(sw, base, kept)
+    assert len(sp) == 7 * 6 * 4  # 7 contexts x 6 budgets x 4 lrs
+    assert len({r.run_id() for r in sp}) == len(sp)
+    assert sw.sparsity.lrs_for_fraction(0.000001)[0] == 1e-3
+    pilot = expand_pilot(sw, base)
+    assert len(pilot) == 3 * 2 * 6
+    # pilot-grid runs inside the lean bands: 0.01% with 3e-4 and 1e-3, for knowledge and arbitrary_labels c0
+    # (math_methods c0 isn't a kept context)
+    assert len({r.run_id() for r in pilot} & {r.run_id() for r in sp}) == 4
+
+
+def test_select_by_val_uses_mean_val_only(tmp_path):
+    from sfcd.paths import Paths, write_json
+    from sfcd.pipeline import stage_select_by_val
+
+    paths = Paths(tmp_path)
+    vals = {1e-5: [0.5, 0.6, 0.7], 1e-4: [0.9, 0.9, 0.8]}  # 1e-4 better on average
+    for lr, vs in vals.items():
+        for cid, v in enumerate(vs):
+            cfg = {"task": "knowledge", "context_id": cid, "granularity": "weight", "selector": "topk",
+                   "budget_blocks": None, "budget_frac": 0.001, "lr": lr}
+            write_json(paths.result("sparsity", f"{lr}-{cid}"),
+                       {"run_id": f"{lr}-{cid}", "config": cfg, "student_val": v, "mmlu_forgetting": 0.5})
+    best = stage_select_by_val(paths)
+    assert best == {"knowledge|weight|topk|f0.001": 1e-4}
+
+
+def test_budget_frac(tiny):
+    lin = eligible_linears(tiny)
+    total = sum(li.numel for li in lin)
+    assert budget_params(lin, budget_frac=0.01) == round(0.01 * total)
+    g = torch.Generator().manual_seed(0)
+    scores = {li.param_name: torch.rand(li.out_features, li.in_features, generator=g) for li in lin}
+    m = select(scores, lin, "weight", None, budget_frac=0.01)
+    assert m.n_selected(lin) == round(0.01 * total)
+    with pytest.raises(ValueError):
+        select(scores, lin, "block", None, budget_frac=0.01)
+
+
+def test_arbitrary_labels_offline():
+    from sfcd.tasks.arbitrary_labels import ArbitraryLabelTask, synthetic_pool
+
+    t = ArbitraryLabelTask(pool_loader=synthetic_pool)
+    cfg = DataCfg()
+    for cid, n_cls in [(0, 4), (2, 6), (4, 14)]:
+        ctx, sp = t.build(cid, cfg)
+        assert ctx.meta["n_shots"] >= 3 * n_cls
+        assert len({e.answer for e in sp["test"]}) == n_cls
+        assert abs(t.trivial_baseline(sp["test"]) - 1 / n_cls) < 0.02
+        assert t.is_correct(sp["test"][0].answer + ".", sp["test"][0])
+    assert t.build(0, cfg)[0].text == t.build(0, cfg)[0].text  # deterministic
+
+
+def test_recovery_uses_trivial_floor():
+    from sfcd.evaluate import recovery
+
+    assert recovery(0.5, 0.0, 0.6) == pytest.approx(0.5 / 0.6)
+    assert recovery(0.5, 0.0, 0.6, trivial=0.5) == pytest.approx(0.0)  # constant-label student: no credit
+    assert recovery(0.55, 0.0, 0.6, trivial=0.5) == pytest.approx(0.5)
+
+
+def test_filter_keeps_other_tasks(tmp_path):
+    from sfcd.paths import Paths, read_json, write_json
+    from sfcd.pipeline import stage_filter
+
+    paths = Paths(tmp_path)
+    write_json(paths.kept(), {"kept": {"knowledge": [0, 1, 2]}, "details": {}})
+    base = load_base("configs/base.yaml")
+    # margins over max(zero-shot, trivial): 0.05 (fails), 0.35, 0.33, 0.63, 0.28 -> best three are 1, 2, 3
+    for cid, (icl, triv) in enumerate([(0.30, 0.25), (0.60, 0.25), (0.50, 0.17), (0.70, 0.07), (0.35, 0.07)]):
+        write_json(paths.ctx_dir("arbitrary_labels", cid) / "baselines.json",
+                   {"zero_shot_val": 0.0, "icl_val": icl, "trivial_val": triv})
+    kept = stage_filter(paths, base, ["arbitrary_labels"])
+    assert kept["arbitrary_labels"] == [1, 2, 3] and kept["knowledge"] == [0, 1, 2]
+    assert read_json(paths.kept())["kept"]["knowledge"] == [0, 1, 2]
+
+
+def test_range_check_runs_are_phase1_runs():
+    from sfcd.config import expand_range_check, expand_sparsity
+
+    sw = load_sweep("configs/sweep.yaml")
+    base = load_base(sw.base_config)
+    rc = expand_range_check(sw, base)
+    assert len(rc) == 20
+    current = [r for r in rc if r.task in sw.tasks]  # method_math (v1) has since been replaced
+    assert current and {r.run_id() for r in current} <= {r.run_id() for r in expand_sparsity(sw, base)}
+
+
+def test_presence_penalty_only_hits_generated_tokens():
+    from sfcd.model import PresencePenalty
+
+    ids = torch.tensor([[1, 2, 3, 5, 5]])  # prompt = first 3 tokens, generated = [5, 5]
+    scores = torch.zeros(1, 8)
+    out = PresencePenalty(1.5, prompt_len=3)(ids, scores)
+    assert out[0, 5] == -1.5 and out[0, 1] == 0 and out[0, 2] == 0 and (out[0, [0, 4, 6, 7]] == 0).all()
+
+
+def test_pick_lr_one_se_rule_with_teacher_cap():
+    from sfcd.analysis.select_rule import picks
+
+    def run(lr, val, teacher=0.99, n=100):
+        return {"task": "t", "fkey": 1.0, "lr": lr, "student_val": val, "icl_val": teacher, "n_val": n}
+
+    # best 0.80 (lr 1e-3), SE = sqrt(.8*.2/100) = 0.04 -> threshold 0.76 -> smallest lr with val >= 0.76 is 3e-4
+    rs = [run(1e-4, 0.70), run(3e-4, 0.77), run(1e-3, 0.80), run(3e-3, 0.60)]
+    assert picks(rs, ("task", "fkey"))[("t", 1.0)]["lr"] == 3e-4
+    # teacher cap: teacher val 0.65 is below best - SE, so the smallest lr reaching 0.65 wins
+    rs = [run(1e-4, 0.70, teacher=0.65), run(3e-4, 0.77, teacher=0.65), run(1e-3, 0.80, teacher=0.65)]
+    assert picks(rs, ("task", "fkey"))[("t", 1.0)]["lr"] == 1e-4

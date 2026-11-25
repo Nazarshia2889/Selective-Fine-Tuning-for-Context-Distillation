@@ -44,6 +44,9 @@ class Task(ABC):
     name: str
     system_prompt: str = "You are a helpful assistant. Answer concisely."
     max_new_tokens: int = 32
+    # Optional per-task overrides of the data settings (None = use DataCfg):
+    candidate_ids: list[int] | None = None  # which candidate contexts to build/run (default range(n_candidates))
+    n_keep: int | None = None  # how many contexts the filter keeps
 
     def rng(self, context_id: int, cfg: DataCfg) -> random.Random:
         return random.Random(f"{self.name}-{cfg.seed}-{context_id}")
@@ -58,6 +61,11 @@ class Task(ABC):
 
     def user_message(self, context_text: str | None, query: str) -> str:
         return f"{context_text}\n\n{query}" if context_text else query
+
+    def trivial_baseline(self, examples: list[Example]) -> float:
+        """Accuracy available without learning the task (e.g. always giving the majority label).
+        Recovery is measured from max(zero-shot, this)."""
+        return 0.0
 
     def accuracy(self, predictions: list[str], examples: list[Example]) -> float:
         if not examples:
